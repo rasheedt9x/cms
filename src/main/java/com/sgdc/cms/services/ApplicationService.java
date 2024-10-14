@@ -27,14 +27,43 @@ public class ApplicationService {
     }
 
 
-    public Long saveApplication(ApplicationDto dto){
+    public String[] saveApplication(ApplicationDto dto){
         Application application = new Application();
         application.setName(dto.getName());
-        application.setEmail(dto.getEmail());
         application.setStatus(ApplicationStatus.PENDING);
         application.setGender(dto.getGender());
         application.setNationality(dto.getNationality());
         application.setAddress(dto.getAddress());
+
+        application.setSscSchool(dto.getSscSchool());
+        application.setSscYearOfPassing(dto.getSscYearOfPassing());
+        application.setSscMarks(dto.getSscMarks());
+
+        application.setIntermediateCollege(dto.getIntermediateCollege());
+        application.setIntermediateYearOfPassing(dto.getIntermediateYearOfPassing());
+        application.setIntermediateMarks(dto.getIntermediateMarks());
+
+        application.setPrimaryPhone(dto.getPrimaryPhone());
+        application.setSecondaryPhone(dto.getSecondaryPhone());
+        application.setGuardianName(dto.getGuardianName());
+        application.setGuardianPhone(dto.getGuardianPhone());
+
+        application.setSecondLanguage(dto.getSecondLanguage());
+        application.setDegreeCourse(dto.getDegreeCourse());
+        application.setReligion(dto.getReligion());
+        application.setUsername(dto.getUsername());
+        application.setCaste(dto.getCaste());
+        application.setMotherAadhaar(dto.getMotherAadhaar());
+        application.setStudentAadhaar(dto.getStudentAadhaar());
+
+
+        if (repository.existsByEmail(dto.getEmail())) {
+            throw new ApplicationSaveException("Email already exists", new RuntimeException());
+        } else {
+            application.setEmail(dto.getEmail());
+        }
+
+
         try {
             SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
             application.setDateOfBirth(format.parse(dto.getDateOfBirth()));
@@ -46,7 +75,7 @@ public class ApplicationService {
        
         try {	
             repository.save(application);
-            return application.getId();
+            return new String[] {String.valueOf(application.getId()), application.getEmail()};
         } catch (Exception e) {
             logger.error("Error saving application: "+e.getMessage());
             throw new ApplicationSaveException("Failed to save application", e);

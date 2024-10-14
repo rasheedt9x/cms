@@ -29,7 +29,7 @@ public class ApplicationController {
 
 	private final Logger logger = LoggerFactory.getLogger(ApplicationController.class);
 
-	private ApplicationService applicationService;
+	private final ApplicationService applicationService;
 
 	@Autowired
 	public ApplicationController(ApplicationService service) {
@@ -39,10 +39,10 @@ public class ApplicationController {
 	
 	@PostMapping("/new")
 	public ResponseEntity<?> apply(@RequestBody ApplicationDto dto) {
-		Long id = applicationService.saveApplication(dto);
+		String[] obj = applicationService.saveApplication(dto);
 		ResponseEntity<?> resp = ResponseEntity
 					.status(HttpStatus.CREATED)
-					.body("{\"application_id\":  \" "+Long.toString(id) + "\"}");
+					.body("{\"application_id\":  \" "+obj[0] + "\", \"email\" : \""+ obj[1] + "\"}");
 					
 	    return resp;
 	}

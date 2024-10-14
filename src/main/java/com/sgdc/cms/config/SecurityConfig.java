@@ -46,14 +46,11 @@ public class SecurityConfig {
 	            request            
 	        .requestMatchers("/", "/api/v1/applications/new").permitAll()
             // Allow ADMIN and ADMISSION_MANAGER to access specific API endpoints
-            .requestMatchers("/api/v1/groups/**", "/api/v1/students/**", "/api/v1/applications/**")
+            
+           .requestMatchers("/api/v1/students/get/**").hasRole("STUDENT")                
+              .requestMatchers("/api/v1/groups/**", "/api/v1/students/**", "/api/v1/applications/**")
             .hasAnyRole("ADMIN", "ADMISSION_MANAGER")
-
-            // Now we handle the STUDENT role, you need to define this before anyRequest()
-            .requestMatchers("/api/v1/students/get/**").hasRole("STUDENT")
-
-            // Finally, define any request that is not caught by the previous rules
-            .anyRequest().authenticated(); // This should be the last statement
+           .anyRequest().authenticated(); // This should be the last statement
     });
 
 
