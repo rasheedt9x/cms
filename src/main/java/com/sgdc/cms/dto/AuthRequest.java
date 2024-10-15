@@ -1,8 +1,6 @@
 package com.sgdc.cms.dto;
 
-/**
- * AuthRequest
- */
+
 public class AuthRequest {
 
 	private String username;

@@ -15,8 +15,8 @@ import com.sgdc.cms.models.Student;
 public interface StudentRepository extends JpaRepository<Student, Long> {
     public Optional<Student> findByUsername(String username);
 
-
-    
+    public Student findByStudentId(String studentId);
+  
     @Query("SELECT CASE WHEN COUNT(s) > 0 THEN true ELSE false END FROM Student s WHERE s.username = :username")
     boolean existsByUsername(@Param("username") String username);
 }

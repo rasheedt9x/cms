@@ -42,7 +42,7 @@ public class ApplicationController {
 		String[] obj = applicationService.saveApplication(dto);
 		ResponseEntity<?> resp = ResponseEntity
 					.status(HttpStatus.CREATED)
-					.body("{\"application_id\":  \" "+obj[0] + "\", \"email\" : \""+ obj[1] + "\"}");
+					.body("{\"application_id\":\" "+obj[0] + "\", \"email\" : \""+ obj[1] + "\"}");
 					
 	    return resp;
 	}

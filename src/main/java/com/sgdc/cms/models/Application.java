@@ -3,7 +3,10 @@ package com.sgdc.cms.models;
 
 
 import java.util.Date;
-import java.util.UUID;
+
+import org.hibernate.type.TrueFalseConverter;
+
+import com.sgdc.cms.annotations.CustomApplicationID;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,7 +15,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
@@ -26,7 +28,16 @@ public class Application {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "name")
+    @CustomApplicationID
+    @Column(name = "application_id",unique = true)
+    private String applicationId;
+
+    public void setId(Long id) {
+		this.id = id;
+	}
+	
+
+	@Column(name = "name")
     private String name;
 
     @Column(name = "email", unique = true)
@@ -48,10 +59,10 @@ public class Application {
     @Temporal(TemporalType.DATE)    
     private Date dateOfBirth;
 
-    @Column(name = "username")
+    @Column(name = "username", unique = true)
     private String username;
 
-    @Column(name = "primary_phone")
+    @Column(name = "primary_phone", unique = true)
     private String primaryPhone;
 
     @Column(name = "secondary_phone")
@@ -96,7 +107,7 @@ public class Application {
     @Column(name = "religion")
     private String religion;
 
-    @Column(name = "student_aadhaar")
+    @Column(name = "student_aadhaar",unique = true)
     private String studentAadhaar;
 
     @Column(name = "mother_aadhaar")
@@ -108,6 +119,14 @@ public class Application {
     //     this.id = UUID.randomUUID();
     // }
 
+
+	public String getApplicationId() {
+		return applicationId;
+	}
+
+	public void setApplicationId(String applicationId) {
+		this.applicationId = applicationId;
+	}
     public Long getId() {
         return this.id;
     }

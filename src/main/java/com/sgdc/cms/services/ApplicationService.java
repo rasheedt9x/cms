@@ -75,7 +75,7 @@ public class ApplicationService {
        
         try {	
             repository.save(application);
-            return new String[] {String.valueOf(application.getId()), application.getEmail()};
+            return new String[] {application.getApplicationId(), application.getEmail()};
         } catch (Exception e) {
             logger.error("Error saving application: "+e.getMessage());
             throw new ApplicationSaveException("Failed to save application", e);

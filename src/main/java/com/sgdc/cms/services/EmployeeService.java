@@ -42,7 +42,7 @@ public class EmployeeService {
     public void initAdmins() {
         try {
             if (employeeRepository.existsByUsername("admin")) {
-            	return;
+                return;
             }
             Employee e = new Employee();
             e.setName("ADMIN");
@@ -136,6 +136,15 @@ public class EmployeeService {
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Couldnt save employee", e);
+        }
+    }
+
+    public String findEmployeeByEmployeeId(String employeeId) {
+        Employee e = employeeRepository.findByEmployeeId(employeeId);
+        if (e != null) {
+            return e.getUsername();
+        } else {
+            return null;
         }
     }
 }
