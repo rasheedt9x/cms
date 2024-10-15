@@ -1,5 +1,7 @@
 package com.sgdc.cms.controllers;
 
+import java.util.List;
+
 import javax.lang.model.element.ModuleElement.UsesDirective;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +51,7 @@ public class AuthController {
     public ResponseEntity<?> authenticate(@RequestBody AuthRequest authRequest) {
         String username = authRequest.getUsername();
         String id = new String(username);
+        
         System.out.println("Got username: " + username);
         try {
             username = studentService.findStudentByStudentId(id);
@@ -63,8 +66,9 @@ public class AuthController {
                     new UsernamePasswordAuthenticationToken(username,authRequest.getPassword()));
 
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-            String token = jwtTokenProvider.generateToken(userDetails.getUsername());
-            return ResponseEntity.ok(new AuthResponse(token));
+             String token = jwtTokenProvider.generateToken(userDetails.getUsername());
+            Object[] roles = userDetails.getAuthorities().toArray();
+            return ResponseEntity.ok(new AuthResponse(token,roles));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Credentials");
