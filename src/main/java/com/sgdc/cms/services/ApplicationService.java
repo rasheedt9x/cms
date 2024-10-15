@@ -6,6 +6,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.sgdc.cms.dto.ApplicationDto;
@@ -13,7 +14,6 @@ import com.sgdc.cms.exceptions.ApplicationSaveException;
 import com.sgdc.cms.models.Application;
 import com.sgdc.cms.models.ApplicationStatus;
 import com.sgdc.cms.repositories.ApplicationRepository;
-
 
 @Service
 public class ApplicationService {    
@@ -84,6 +84,10 @@ public class ApplicationService {
 
 	public List<Application> getAllApplications(){
 	    return repository.findAll();
+	}
+
+	public List<Application> getAllApplicationsByPage(int pageNumber,int pageSize) {
+	    return repository.findAll(PageRequest.of(pageNumber,pageSize)).toList();
 	}
 
 	public Application updateStatus(Long id, ApplicationStatus status) {

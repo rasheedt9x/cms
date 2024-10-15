@@ -18,8 +18,10 @@ import com.sgdc.cms.dto.ApplicationDto;
 import com.sgdc.cms.models.Application;
 import com.sgdc.cms.models.ApplicationStatus;
 import com.sgdc.cms.services.ApplicationService;
-import java.util.List;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 @RestController
@@ -40,9 +42,12 @@ public class ApplicationController {
 	@PostMapping("/new")
 	public ResponseEntity<?> apply(@RequestBody ApplicationDto dto) {
 		String[] obj = applicationService.saveApplication(dto);
+		Map<String, String> map = new HashMap<>();
+		map.put("application_id", obj[0]);
+		map.put("email",obj[1]);
 		ResponseEntity<?> resp = ResponseEntity
-					.status(HttpStatus.CREATED)
-					.body("{\"application_id\":\" "+obj[0] + "\", \"email\" : \""+ obj[1] + "\"}");
+					.status(HttpStatus.CREATED).body(map);
+					//.body("{\"application_id\":\" "+obj[0] + "\", \"email\" : \""+ obj[1] + "\"}");
 					
 	    return resp;
 	}
@@ -53,6 +58,13 @@ public class ApplicationController {
 		return ResponseEntity.ok(list);
 	}
 
+	@GetMapping("/all/{page}")
+	public ResponseEntity<List<Application>> getApplicationsByPage(@PathVariable("page") int page) {
+		List<Application> list = applicationService.getAllApplicationsByPage(page, 10);
+		return ResponseEntity.ok(list);
+	}
+
+	
 	@PostMapping("/{id}/status")
 	public ResponseEntity<Application> updateApplicationStatus(@PathVariable("id") Long id, @RequestParam("status") ApplicationStatus status){
 		Application application = applicationService.updateStatus(id, status);

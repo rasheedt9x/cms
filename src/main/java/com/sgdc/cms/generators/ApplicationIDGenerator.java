@@ -31,18 +31,19 @@ public class ApplicationIDGenerator implements BeforeExecutionGenerator {
                         String lastId = rs.getString(1);
                         if (lastId != null && lastId.startsWith(prefix)) {
                             // Extract numeric part and increment
-                            String numericPart = lastId.substring(2); // remove "ST"
-                            Long val = Long.parseLong(numericPart);
+                            String numericPart = lastId.substring(6);
+                            long val = Long.parseLong(numericPart);
+                            logger.info(Long.toString(val));// remove "ST"
                             val = val + 1;
                             // Format the new ID
                             newId[0] = String.format("%s%d", prefix, val);
                         } else {
                             // If there are no IDs starting with ST
-                            newId[0] = "SGDCAP0000";
+                            newId[0] = "SGDCAP1001";
                         }
                     } else {
                         // For the first student if no records are found
-                        newId[0] = "SGDCAP0000";
+                        newId[0] = "SGDCAP1001";
                     }
 
                 } catch (SQLException e) {

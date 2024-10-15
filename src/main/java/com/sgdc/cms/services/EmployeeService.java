@@ -50,22 +50,22 @@ public class EmployeeService {
             e.setUsername("admin");
             e.setPassword(passwordEncoder.encode("1234"));
 
-            Role role = roleRepository.findByRoleName("ADMIN");
+            Role role = roleRepository.findByRoleName("ADMISSION_MANAGER");
             if (role != null) {
                 e.addRoles(role);
             } else {
-                Role tRole = new Role("ADMIN");
+                Role tRole = new Role("ADMISSION_MANAGER");
                 roleRepository.save(tRole);
                 e.addRoles(tRole);
             }
 
             logger.info("Init Admins");
-            Department dept = departmentRepository.findByDepartmentName("ADMIN");
+            Department dept = departmentRepository.findByDepartmentName("MANAGEMENT");
             if (dept != null) {
                 e.setDepartment(dept);
             } else {
                 Department d = new Department();
-                d.setDepartmentName("ADMIN");
+                d.setDepartmentName("MANAGEMENT");
                 departmentRepository.save(d);
                 e.setDepartment(d);
             }

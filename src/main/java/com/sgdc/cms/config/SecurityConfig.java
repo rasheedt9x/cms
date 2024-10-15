@@ -5,28 +5,20 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 
-
-import com.sgdc.cms.repositories.EmployeeRepository;
-import com.sgdc.cms.repositories.StudentRepository;
 import com.sgdc.cms.security.jwt.JwtAuthenticationFilter;
 import com.sgdc.cms.security.jwt.JwtTokenProvider;
 import com.sgdc.cms.services.LoginDetailsService;
-
 
 
 @Configuration
@@ -54,9 +46,10 @@ public class SecurityConfig {
 	        .requestMatchers("/","/auth/**", "/api/v1/applications/new").permitAll()
             // Allow ADMIN and ADMISSION_MANAGER to access specific API endpoints
             
-           .requestMatchers("/api/v1/students/get/**").hasRole("STUDENT")                
-              .requestMatchers("/api/v1/groups/**", "/api/v1/students/**", "/api/v1/applications/**")
-            .hasAnyRole("ADMIN", "ADMISSION_MANAGER")
+           .requestMatchers("/api/v1/students/get/**").hasRole("STUDENT")
+           .requestMatchers("/api/v1/applications/**").hasRole("ADMISSION_MANAGER")                
+              .requestMatchers("/api/v1/groups/**", "/api/v1/students/**", "/api/v1/applications/**", "/api/v1/dept/**", "/api/v1/employees/**")
+            .hasRole("ADMIN")
            .anyRequest().authenticated(); // This should be the last statement
     });
 
