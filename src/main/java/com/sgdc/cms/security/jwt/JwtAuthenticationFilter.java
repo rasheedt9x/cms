@@ -9,6 +9,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.sgdc.cms.services.TokenService;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,10 +23,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final UserDetailsService userDetailsService;
-
-    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider, UserDetailsService userDetailsService) {
+    private final TokenService tokenService;
+    
+    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider, UserDetailsService userDetailsService, TokenService ts) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.userDetailsService = userDetailsService;
+        this.tokenService = ts;
     }
 
 @Override
@@ -33,7 +37,7 @@ protected void doFilterInternal(HttpServletRequest request, HttpServletResponse 
     String token = jwtTokenProvider.extractToken(request);
     if (token != null) {
         System.out.println("Extracted Token: " + token);
-        if (jwtTokenProvider.validateToken(token)) {
+        if (jwtTokenProvider.validateToken(token) && !tokenService.isTokenBlacklisted(token)) {
             String username = jwtTokenProvider.getUsernameFromToken(token);
             System.out.println("Authenticated User: " + username);
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);

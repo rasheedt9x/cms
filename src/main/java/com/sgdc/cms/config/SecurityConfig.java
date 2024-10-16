@@ -15,13 +15,14 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.sgdc.cms.security.jwt.JwtAuthenticationFilter;
 import com.sgdc.cms.security.jwt.JwtTokenProvider;
 import com.sgdc.cms.services.LoginDetailsService;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import com.sgdc.cms.services.TokenService;
 
 
 @Configuration
@@ -35,6 +36,9 @@ public class SecurityConfig {
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
+
+    @Autowired
+    private TokenService tokenService;
 
     // @Autowired
     // public SecurityConfig(LoginDetailsService userDetailsService) {
@@ -80,7 +84,7 @@ public class SecurityConfig {
         //     });
         // });
 
-        http.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider,userDetailsService ),UsernamePasswordAuthenticationFilter.class );
+        http.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider,userDetailsService,tokenService ),UsernamePasswordAuthenticationFilter.class );
         http.formLogin(AbstractHttpConfigurer::disable);                
         http.logout(logout -> {
             logout.logoutUrl("/logout");

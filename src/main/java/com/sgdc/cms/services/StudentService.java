@@ -53,6 +53,7 @@ public class StudentService {
             // s.setUsername(dto.getUsername());
             s.setPassword(passwordEncoder.encode(dto.getPassword()));
             s.setYearOfStudy(dto.getYearOfStudy());
+        
 
             // logger.info("Student pass " + dto.getPassword());
 

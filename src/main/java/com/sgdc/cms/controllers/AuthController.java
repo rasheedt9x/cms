@@ -21,8 +21,10 @@ import com.sgdc.cms.dto.AuthResponse;
 import com.sgdc.cms.security.jwt.JwtTokenProvider;
 import com.sgdc.cms.services.EmployeeService;
 import com.sgdc.cms.services.StudentService;
+import com.sgdc.cms.services.TokenService;
 
 import ch.qos.logback.classic.net.SocketAppender;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * AuthController
@@ -40,7 +42,9 @@ public class AuthController {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-
+    @Autowired
+    private TokenService tokenService;
+    
     @Autowired
     private StudentService studentService;
 
@@ -66,13 +70,31 @@ public class AuthController {
                     new UsernamePasswordAuthenticationToken(username,authRequest.getPassword()));
 
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-             String token = jwtTokenProvider.generateToken(userDetails.getUsername());
+            String token = jwtTokenProvider.generateToken(userDetails.getUsername());
             Object[] roles = userDetails.getAuthorities().toArray();
             return ResponseEntity.ok(new AuthResponse(token,roles));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Credentials");
         }
+    }
+
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletRequest request) {
+        String token = extractJwtFromRequest(request);
+        if (token != null && jwtTokenProvider.validateToken(token)) {
+        	tokenService.blacklistToken(token);
+        }
+        return ResponseEntity.ok("Logged out succesfully");
+    }
+
+    private String extractJwtFromRequest(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+        if (bearerToken != null && bearerToken.startsWith("Bearer")) {
+        	return bearerToken.substring(7);
+        }
+        return null;
     }
 
 }
