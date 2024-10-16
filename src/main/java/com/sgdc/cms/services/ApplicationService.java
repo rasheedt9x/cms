@@ -2,8 +2,6 @@ package com.sgdc.cms.services;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.function.Supplier;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,9 +81,17 @@ public class ApplicationService {
         }      
     }
 
+    public Long allApplicationCount() {
+        return repository.count();
+    }
+
     public Application getApplicationByApplicationId(String applicationId){
         return repository.findByApplicationId(applicationId).orElseThrow(() -> new RuntimeException("Application not found"));
 
+    }
+
+    public Long getCountByStatus(ApplicationStatus status) {
+        return repository.countByStatus(status);
     }
 
 	public List<Application> getAllApplications(){

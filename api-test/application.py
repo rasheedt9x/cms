@@ -50,7 +50,6 @@ if response.status_code == 200:
     # print(r1.json())
     
     #Get Application by Id
-    
     # r1 = requests.get(main_url + "applications/SGDCAP1001", headers=headers)
     # print(r1.json())
     
@@ -61,21 +60,27 @@ if response.status_code == 200:
     
 
     #Approve applications
-    r1 = requests.post(main_url + "applications/SGDCAP1002/status", headers=headers, json={
-        "status": "APPROVED"
-    })
-    print("r1", r1.content)
+    # r1 = requests.post(main_url + "applications/SGDCAP1002/status", headers=headers, json={
+    #     "status": "APPROVED"
+    # })
+    # print("r1", r1.content)
     
     # #Get applications by Status
     # r1 = requests.get(main_url + "applications/all/status", headers=headers, json={
     #     "status": "APPROVED"
     # })
     # print("r1", r1.json())
-    
-    
-    
-    
 
+    ##Application count by status    
+    # r1 = requests.get(main_url + "applications/count/status",headers=headers, json={
+    #                       "status": "PENDING"
+    #                   })
+
+    # print(r1.json())
+
+    ## All Application count
+    r1 = requests.get(main_url + "applications/count",headers=headers)
+    print(r1.json())
 
 # login = requests.get(main_url + "applications/all", headers=headers)
 # print(login.content)

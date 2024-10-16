@@ -16,6 +16,8 @@ import com.sgdc.cms.models.Application;
 public interface ApplicationRepository extends JpaRepository<Application, Long> {
     Optional<Application> findByApplicationId(String applicationId);
 
+    @Query("SELECT COUNT(a) from Application a where a.status = :status")
+    long countByStatus(ApplicationStatus status);
 
     List<Application> findByStatus(ApplicationStatus applicationStatus);
     @Query("SELECT CASE WHEN COUNT(a) > 0 THEN true ELSE false END FROM Application a WHERE a.email = :email")
