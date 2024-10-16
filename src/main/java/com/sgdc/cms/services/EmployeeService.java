@@ -41,13 +41,13 @@ public class EmployeeService {
     @PostConstruct
     public void initAdmins() {
         try {
-            if (employeeRepository.existsByUsername("admin")) {
+            if (employeeRepository.existsByUsername("admin") && employeeRepository.existsByUsername("adm_admin")) {
                 return;
             }
             Employee e = new Employee();
-            e.setName("ADMIN");
-            e.setEmail("admin@example.com");
-            e.setUsername("admin");
+            e.setName("ADMISSION_ADMIN");
+            e.setEmail("adm_admin@example.com");
+            e.setUsername("adm_admin");
             e.setPassword(passwordEncoder.encode("1234"));
 
             Role role = roleRepository.findByRoleName("ADMISSION_MANAGER");
@@ -71,6 +71,35 @@ public class EmployeeService {
             }
 
             employeeRepository.save(e);
+//--------------------------------------------------------
+            Employee e1 = new Employee();
+            e1.setName("ADMIN");
+            e1.setEmail("admin@example.com");
+            e1.setUsername("admin");
+            e1.setPassword(passwordEncoder.encode("1234"));
+
+            Role role1 = roleRepository.findByRoleName("ADMIN");
+            if (role1 != null) {
+                e.addRoles(role1);
+            } else {
+                Role tRole1 = new Role("ADMIN");
+                roleRepository.save(tRole1);
+                e1.addRoles(tRole1);
+            }
+
+            logger.info("Init Admins");
+            Department dept1 = departmentRepository.findByDepartmentName("MANAGEMENT");
+            if (dept1 != null) {
+                e1.setDepartment(dept1);
+            } else {
+                Department d1 = new Department();
+                d1.setDepartmentName("MANAGEMENT");
+                departmentRepository.save(d1);
+                e1.setDepartment(d1);
+            }
+
+            employeeRepository.save(e1);
+
         } catch (Exception ex) {
             logger.error("Error during PostConstruct initialization: ", ex);
         }

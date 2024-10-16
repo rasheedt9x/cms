@@ -32,7 +32,7 @@ protected void doFilterInternal(HttpServletRequest request, HttpServletResponse 
         throws ServletException, IOException {
     String token = jwtTokenProvider.extractToken(request);
     if (token != null) {
-//        System.out.println("Extracted Token: " + token);
+        System.out.println("Extracted Token: " + token);
         if (jwtTokenProvider.validateToken(token)) {
             String username = jwtTokenProvider.getUsernameFromToken(token);
             System.out.println("Authenticated User: " + username);
@@ -41,6 +41,7 @@ protected void doFilterInternal(HttpServletRequest request, HttpServletResponse 
                 UsernamePasswordAuthenticationToken upawt = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
                 upawt.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                System.out.println(userDetails.getAuthorities().toString());
                 SecurityContextHolder.getContext().setAuthentication(upawt);
             }
         } else {

@@ -2,6 +2,7 @@ package com.sgdc.cms.services;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,6 +83,11 @@ public class ApplicationService {
         }      
     }
 
+    public Application getApplicationByApplicationId(String applicationId){
+        return repository.findByApplicationId(applicationId).orElseThrow(() -> new RuntimeException("Application not found"));
+
+    }
+
 	public List<Application> getAllApplications(){
 	    return repository.findAll();
 	}
@@ -90,8 +96,12 @@ public class ApplicationService {
 	    return repository.findAll(PageRequest.of(pageNumber,pageSize)).toList();
 	}
 
-	public Application updateStatus(Long id, ApplicationStatus status) {
-        Application application = repository.findById(id).orElseThrow(() -> new RuntimeException("Application not found"));
+    public List<Application> getAllApplicationsByStatus(ApplicationStatus status) {
+        return repository.findByStatus(status);
+    }
+
+	public Application updateStatus(String id, ApplicationStatus status) {
+        Application application = repository.findByApplicationId(id).orElseThrow(() -> new RuntimeException("Application not found"));
         application.setStatus(status);
         return repository.save(application);    
 	}

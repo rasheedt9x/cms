@@ -52,6 +52,14 @@ public class ApplicationController {
 	    return resp;
 	}
 
+	@GetMapping("/{id}")
+	public ResponseEntity<?> applicationByApplicationId(@PathVariable("id") String applicationId){
+		Application application = applicationService.getApplicationByApplicationId(applicationId);
+		return ResponseEntity.ok(application);
+	}
+
+
+
 	@GetMapping("/all")
 	public ResponseEntity<List<Application>> allApplications(){
 		List<Application> list = applicationService.getAllApplications();
@@ -60,15 +68,35 @@ public class ApplicationController {
 
 	@GetMapping("/all/{page}")
 	public ResponseEntity<List<Application>> getApplicationsByPage(@PathVariable("page") int page) {
+		page -= 1;
 		List<Application> list = applicationService.getAllApplicationsByPage(page, 10);
 		return ResponseEntity.ok(list);
 	}
 
-	
-	@PostMapping("/{id}/status")
-	public ResponseEntity<Application> updateApplicationStatus(@PathVariable("id") Long id, @RequestParam("status") ApplicationStatus status){
-		Application application = applicationService.updateStatus(id, status);
+	@GetMapping(value = "/all/status", consumes = "application/json")
+	public ResponseEntity<List<Application>> getApplicationsByStatus(@RequestBody Map<String, String> requestBody) {
+		ApplicationStatus status = ApplicationStatus.valueOf(requestBody.get("status"));
+		List<Application> list = applicationService.getAllApplicationsByStatus(status);
+		return ResponseEntity.ok(list);
+	}
+
+
+//	@PostMapping("/{id}/status")
+//	public ResponseEntity<Application> updateApplicationStatus(@PathVariable("id") String applicationId, @RequestParam("status") ApplicationStatus status){
+//		Application application = applicationService.updateStatus(applicationId, status);
+//		return ResponseEntity.ok(application);
+//	}
+
+	@PostMapping(value = "/{id}/status", consumes = "application/json")
+	public ResponseEntity<Application> updateApplicationStatus(
+			@PathVariable("id") String applicationId,
+			@RequestBody Map<String, String> requestBody
+	) {
+		ApplicationStatus status = ApplicationStatus.valueOf(requestBody.get("status"));
+		Application application = applicationService.updateStatus(applicationId, status);
 		return ResponseEntity.ok(application);
 	}
-	
+
+
+
 }
