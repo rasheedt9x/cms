@@ -19,6 +19,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.sgdc.cms.security.jwt.JwtAuthenticationFilter;
 import com.sgdc.cms.security.jwt.JwtTokenProvider;
 import com.sgdc.cms.services.LoginDetailsService;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 
 @Configuration
@@ -89,6 +92,9 @@ public class SecurityConfig {
             });
         }); 
  //       http.csrf(AbstractHttpConfigurer::disable);
+        http.cors(cors -> {
+            cors.configurationSource(corsConfigurationSource());
+        });
         http.csrf(cust -> {
            cust.disable(); 
         });
@@ -107,5 +113,17 @@ public class SecurityConfig {
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.addAllowedOrigin("http://localhost:5173"); // Your React app's URL
+        config.addAllowedHeader("*");
+        config.addAllowedMethod("*");
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
 }
