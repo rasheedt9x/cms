@@ -10,6 +10,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -86,15 +87,19 @@ public class SecurityConfig {
 
         http.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider,userDetailsService,tokenService ),UsernamePasswordAuthenticationFilter.class );
         http.formLogin(AbstractHttpConfigurer::disable);                
-        http.logout(logout -> {
-            logout.logoutUrl("/logout");
-            logout.invalidateHttpSession(true);
-            logout.deleteCookies("JSESSIONID");
-            logout.clearAuthentication(true);    
-            logout.logoutSuccessHandler((req,res,auth) -> {                     
-                res.getWriter().write("{\"status\": \"success\", \"message\": \"Logout successful\"}");
-            });
-        }); 
+        // http.logout(logout -> {
+        //     logout.logoutUrl("/logout");
+        //     logout.invalidateHttpSession(true);
+        //     logout.deleteCookies("JSESSIONID");
+        //     logout.clearAuthentication(true);    
+        //     logout.logoutSuccessHandler((req,res,auth) -> {                     
+        //         res.getWriter().write("{\"status\": \"success\", \"message\": \"Logout successful\"}");
+        //     });
+        // }); 
+        http.logout(AbstractHttpConfigurer::disable);
+        http.sessionManagement(sess -> {
+            sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        });
  //       http.csrf(AbstractHttpConfigurer::disable);
         http.cors(cors -> {
             cors.configurationSource(corsConfigurationSource());
