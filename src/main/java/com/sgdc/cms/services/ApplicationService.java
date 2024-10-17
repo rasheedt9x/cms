@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.sgdc.cms.dto.ApplicationDto;
@@ -31,11 +32,15 @@ public class ApplicationService {
 
     private StudentGroupRepository studentGroupRepository;
 
+    private PasswordEncoder passwordEncoder;
+
     @Autowired
-    public ApplicationService(ApplicationRepository repository, StudentRepository studentRepo, StudentGroupRepository sgr) {
+    public ApplicationService(ApplicationRepository repository, StudentRepository studentRepo,
+            StudentGroupRepository sgr, PasswordEncoder pwe) {
         this.repository = repository;
         this.studentRepository = studentRepo;
         this.studentGroupRepository = sgr;
+        this.passwordEncoder = pwe;
     }
 
     public String[] saveApplication(ApplicationDto dto) {
@@ -117,155 +122,159 @@ public class ApplicationService {
         return repository.findByStatus(status);
     }
 
-    // public Map<String, Object> updateStatus(String id, ApplicationStatus status) {
-    //     Application application = repository.findByApplicationId(id)
-    //             .orElseThrow(() -> new RuntimeException("Application not found"));
-    //     application.setStatus(status);
+    // public Map<String, Object> updateStatus(String id, ApplicationStatus status)
+    // {
+    // Application application = repository.findByApplicationId(id)
+    // .orElseThrow(() -> new RuntimeException("Application not found"));
+    // application.setStatus(status);
 
-    //     try {
-    //         application = repository.save(application);
-            
-    //         logger.info(application.getDegreeCourse());
-    //     } catch (Exception e) {
-    //         logger.error("Error updating status: " + e.getMessage());
-    //         throw new RuntimeException("Error updating status");
-    //     }
+    // try {
+    // application = repository.save(application);
 
-    //     Student dto = new Student();
-    //     dto.setName(application.getName());
-    //     dto.setUsername(application.getUsername());
-    //     dto.setAddress(application.getAddress());
-    //     dto.setYearOfStudy(1);
-    //     dto.setEmail(application.getEmail());
-
-    //     logger.info("Group: " + dto.getGroup());
-
-
-    //     StudentGroup group = studentGroupRepository.findByGroupName(application.getDegreeCourse());
-    //     if(group == null) {
-    //         logger.info("null bro");
-    //     }
-    //     logger.info("Group: " + group.getGroupname());
-    //     dto.setGroup(group);
-    //     dto.setGender(application.getGender());
-    //     SimpleDateFormat fmt = new SimpleDateFormat("dd/MM/yyyy");
-    //     dto.setDateOfBirth(application.getDateOfBirth());
-    //     dto.setNationality(application.getNationality());
-    //     dto.setDegreeCourse(application.getDegreeCourse());
-
-    //     dto.setPrimaryPhone(application.getPrimaryPhone());
-    //     dto.setSecondaryPhone(application.getSecondaryPhone());
-
-    //     dto.setGuardianName(application.getGuardianName());
-    //     dto.setGuardianPhone(application.getGuardianPhone());
-
-    //     dto.setSscSchool(application.getSscSchool());
-    //     dto.setSscYearOfPassing(application.getSscYearOfPassing());
-    //     dto.setSscMarks(application.getSscMarks());
-
-    //     dto.setIntermediateCollege(application.getIntermediateCollege());
-    //     dto.setIntermediateYearOfPassing(application.getIntermediateYearOfPassing());
-    //     dto.setIntermediateMarks(application.getIntermediateMarks());
-
-    //     dto.setSecondLanguage(application.getSecondLanguage());
-    //     dto.setCaste(application.getCaste());
-    //     dto.setReligion(application.getReligion());
-
-    //     dto.setStudentAadhaar(application.getStudentAadhaar());
-    //     dto.setMotherAadhaar(application.getMotherAadhaar());
-
-    //     try {
-    //         studentRepository.save(dto);
-    //     } catch (Exception e) {
-    //         e.printStackTrace();
-    //         throw new RuntimeException("Failed to save Student from Application", e);
-    //     }
-
-    //     String studentId = dto.getStudentId();
-    //     String defaultPassword = "SGDC@123";
-
-    //     Map<String,Object> map = new HashMap<>();
-    //     map.put("studentId", studentId);
-    //     map.put("defaultPassword", defaultPassword);
-    //     return map;
+    // logger.info(application.getDegreeCourse());
+    // } catch (Exception e) {
+    // logger.error("Error updating status: " + e.getMessage());
+    // throw new RuntimeException("Error updating status");
     // }
 
+    // Student dto = new Student();
+    // dto.setName(application.getName());
+    // dto.setUsername(application.getUsername());
+    // dto.setAddress(application.getAddress());
+    // dto.setYearOfStudy(1);
+    // dto.setEmail(application.getEmail());
+
+    // logger.info("Group: " + dto.getGroup());
+
+    // StudentGroup group =
+    // studentGroupRepository.findByGroupName(application.getDegreeCourse());
+    // if(group == null) {
+    // logger.info("null bro");
+    // }
+    // logger.info("Group: " + group.getGroupname());
+    // dto.setGroup(group);
+    // dto.setGender(application.getGender());
+    // SimpleDateFormat fmt = new SimpleDateFormat("dd/MM/yyyy");
+    // dto.setDateOfBirth(application.getDateOfBirth());
+    // dto.setNationality(application.getNationality());
+    // dto.setDegreeCourse(application.getDegreeCourse());
+
+    // dto.setPrimaryPhone(application.getPrimaryPhone());
+    // dto.setSecondaryPhone(application.getSecondaryPhone());
+
+    // dto.setGuardianName(application.getGuardianName());
+    // dto.setGuardianPhone(application.getGuardianPhone());
+
+    // dto.setSscSchool(application.getSscSchool());
+    // dto.setSscYearOfPassing(application.getSscYearOfPassing());
+    // dto.setSscMarks(application.getSscMarks());
+
+    // dto.setIntermediateCollege(application.getIntermediateCollege());
+    // dto.setIntermediateYearOfPassing(application.getIntermediateYearOfPassing());
+    // dto.setIntermediateMarks(application.getIntermediateMarks());
+
+    // dto.setSecondLanguage(application.getSecondLanguage());
+    // dto.setCaste(application.getCaste());
+    // dto.setReligion(application.getReligion());
+
+    // dto.setStudentAadhaar(application.getStudentAadhaar());
+    // dto.setMotherAadhaar(application.getMotherAadhaar());
+
+    // try {
+    // studentRepository.save(dto);
+    // } catch (Exception e) {
+    // e.printStackTrace();
+    // throw new RuntimeException("Failed to save Student from Application", e);
+    // }
+
+    // String studentId = dto.getStudentId();
+    // String defaultPassword = "SGDC@123";
+
+    // Map<String,Object> map = new HashMap<>();
+    // map.put("studentId", studentId);
+    // map.put("defaultPassword", defaultPassword);
+    // return map;
+    // }
 
     public Map<String, Object> updateStatus(String id, ApplicationStatus status) {
-    Application application = repository.findByApplicationId(id)
-            .orElseThrow(() -> new RuntimeException("Application not found"));
-    application.setStatus(status);
+        Application application = repository.findByApplicationId(id)
+                .orElseThrow(() -> new RuntimeException("Application not found"));
+        application.setStatus(status);
+        Map<String, Object> map = new HashMap<>();
+        try {
+            application = repository.save(application);
+            if (status == ApplicationStatus.REJECTED) {
+                map.put("status","REJECTED");
+                return map;
+            }
+            // logger.info("Application saved with degree course: " +
+            // application.getDegreeCourse());
+        } catch (Exception e) {
+            logger.error("Error updating application status", e);
+            throw new RuntimeException("Error updating status", e);
+        }
 
-    try {
-        application = repository.save(application);
-        logger.info("Application saved with degree course: " + application.getDegreeCourse());
-    } catch (Exception e) {
-        logger.error("Error updating application status", e); 
-        throw new RuntimeException("Error updating status", e);
+        // Creating Student DTO from Application
+        Student dto = new Student();
+        dto.setName(application.getName());
+        dto.setUsername(application.getUsername());
+        dto.setAddress(application.getAddress());
+        dto.setYearOfStudy(1);
+        dto.setEmail(application.getEmail());
+        dto.setPassword(passwordEncoder.encode("SGDC@123"));
+
+        logger.info("Creating student DTO for: " + dto.getName());
+
+        StudentGroup group = studentGroupRepository.findByGroupName(application.getDegreeCourse());
+        if (group == null) {
+            logger.warn("Student group not found for degree course: " + application.getDegreeCourse());
+        } else {
+            dto.setGroup(group);
+            logger.info("Group found: " + group.getGroupname());
+        }
+
+        dto.setGender(application.getGender());
+        dto.setDateOfBirth(application.getDateOfBirth());
+        dto.setNationality(application.getNationality());
+        dto.setDegreeCourse(application.getDegreeCourse());
+
+        dto.setPrimaryPhone(application.getPrimaryPhone());
+        dto.setSecondaryPhone(application.getSecondaryPhone());
+
+        dto.setGuardianName(application.getGuardianName());
+        dto.setGuardianPhone(application.getGuardianPhone());
+
+        dto.setSscSchool(application.getSscSchool());
+        dto.setSscYearOfPassing(application.getSscYearOfPassing());
+        dto.setSscMarks(application.getSscMarks());
+
+        dto.setIntermediateCollege(application.getIntermediateCollege());
+        dto.setIntermediateYearOfPassing(application.getIntermediateYearOfPassing());
+        dto.setIntermediateMarks(application.getIntermediateMarks());
+
+        dto.setSecondLanguage(application.getSecondLanguage());
+        dto.setCaste(application.getCaste());
+        dto.setReligion(application.getReligion());
+
+        dto.setStudentAadhaar(application.getStudentAadhaar());
+        dto.setMotherAadhaar(application.getMotherAadhaar());
+
+        try {
+            studentRepository.save(dto);
+            logger.info("Student saved with ID: " + dto.getStudentId());
+        } catch (Exception e) {
+            application.setStatus(ApplicationStatus.valueOf("PENDING"));
+            repository.save(application);
+            logger.error("Failed to save Student from Application", e); // Log the complete stack trace
+            throw new RuntimeException("Failed to save Student from Application", e);
+        }
+
+        String studentId = dto.getStudentId();
+        String defaultPassword = "SGDC@123";
+
+        map.put("studentId", studentId);
+        map.put("defaultPassword", defaultPassword);
+        return map;
     }
-
-    // Creating Student DTO from Application
-    Student dto = new Student();
-    dto.setName(application.getName());
-    dto.setUsername(application.getUsername());
-    dto.setAddress(application.getAddress());
-    dto.setYearOfStudy(1);
-    dto.setEmail(application.getEmail());
-
-    logger.info("Creating student DTO for: " + dto.getName());
-
-    StudentGroup group = studentGroupRepository.findByGroupName(application.getDegreeCourse());
-    if (group == null) {
-        logger.warn("Student group not found for degree course: " + application.getDegreeCourse());
-        // Handle the case where group is null if needed
-    } else {
-        dto.setGroup(group);
-        logger.info("Group found: " + group.getGroupname());
-    }
-    
-    dto.setGender(application.getGender());
-    dto.setDateOfBirth(application.getDateOfBirth());
-    dto.setNationality(application.getNationality());
-    dto.setDegreeCourse(application.getDegreeCourse());
-
-    dto.setPrimaryPhone(application.getPrimaryPhone());
-    dto.setSecondaryPhone(application.getSecondaryPhone());
-
-    dto.setGuardianName(application.getGuardianName());
-    dto.setGuardianPhone(application.getGuardianPhone());
-
-    dto.setSscSchool(application.getSscSchool());
-    dto.setSscYearOfPassing(application.getSscYearOfPassing());
-    dto.setSscMarks(application.getSscMarks());
-
-    dto.setIntermediateCollege(application.getIntermediateCollege());
-    dto.setIntermediateYearOfPassing(application.getIntermediateYearOfPassing());
-    dto.setIntermediateMarks(application.getIntermediateMarks());
-
-    dto.setSecondLanguage(application.getSecondLanguage());
-    dto.setCaste(application.getCaste());
-    dto.setReligion(application.getReligion());
-
-    dto.setStudentAadhaar(application.getStudentAadhaar());
-    dto.setMotherAadhaar(application.getMotherAadhaar());
-
-    try {
-        studentRepository.save(dto);
-        logger.info("Student saved with ID: " + dto.getStudentId());
-    } catch (Exception e) {
-        application.setStatus(ApplicationStatus.valueOf("PENDING"));
-        repository.save(application);
-        logger.error("Failed to save Student from Application", e); // Log the complete stack trace
-        throw new RuntimeException("Failed to save Student from Application", e);
-    }
-
-    String studentId = dto.getStudentId();
-    String defaultPassword = "SGDC@123";
-
-    Map<String, Object> map = new HashMap<>();
-    map.put("studentId", studentId);
-    map.put("defaultPassword", defaultPassword);
-    return map;
-}
 
 }

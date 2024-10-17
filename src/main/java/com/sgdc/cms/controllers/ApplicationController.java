@@ -91,10 +91,10 @@ public class ApplicationController {
 		return ResponseEntity.ok(map);
 	}
 
-	@GetMapping(value = "/all/status", consumes = "application/json")
-	public ResponseEntity<List<Application>> getApplicationsByStatus(@RequestBody Map<String, String> requestBody) {
-		ApplicationStatus status = ApplicationStatus.valueOf(requestBody.get("status"));
-		List<Application> list = applicationService.getAllApplicationsByStatus(status);
+	@GetMapping(value = "/all/status/{status}")
+	public ResponseEntity<List<Application>> getApplicationsByStatus(@PathVariable("status") String status) {
+		ApplicationStatus appStatus = ApplicationStatus.valueOf(status);
+		List<Application> list = applicationService.getAllApplicationsByStatus(appStatus);
 		return ResponseEntity.ok(list);
 	}
 
