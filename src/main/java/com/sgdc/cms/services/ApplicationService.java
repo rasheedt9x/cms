@@ -18,8 +18,10 @@ import com.sgdc.cms.dto.ApplicationDto;
 import com.sgdc.cms.exceptions.ApplicationSaveException;
 import com.sgdc.cms.models.Application;
 import com.sgdc.cms.models.ApplicationStatus;
+import com.sgdc.cms.models.Role;
 import com.sgdc.cms.models.Student;
 import com.sgdc.cms.repositories.ApplicationRepository;
+import com.sgdc.cms.repositories.RoleRepository;
 import com.sgdc.cms.repositories.StudentRepository;
 
 @Service
@@ -34,13 +36,16 @@ public class ApplicationService {
 
     private PasswordEncoder passwordEncoder;
 
+    private RoleRepository roleRepository;
+
     @Autowired
     public ApplicationService(ApplicationRepository repository, StudentRepository studentRepo,
-            StudentGroupRepository sgr, PasswordEncoder pwe) {
+            StudentGroupRepository sgr, PasswordEncoder pwe, RoleRepository roleRepository) {
         this.repository = repository;
         this.studentRepository = studentRepo;
         this.studentGroupRepository = sgr;
         this.passwordEncoder = pwe;
+        this.roleRepository = roleRepository;
     }
 
     public String[] saveApplication(ApplicationDto dto) {
@@ -204,7 +209,7 @@ public class ApplicationService {
         try {
             application = repository.save(application);
             if (status == ApplicationStatus.REJECTED) {
-                map.put("status","REJECTED");
+                map.put("status", "REJECTED");
                 return map;
             }
             // logger.info("Application saved with degree course: " +
@@ -259,6 +264,14 @@ public class ApplicationService {
         dto.setStudentAadhaar(application.getStudentAadhaar());
         dto.setMotherAadhaar(application.getMotherAadhaar());
 
+        Role role = roleRepository.findByRoleName("STUDENT");
+        if (role != null) {
+            dto.addRoles(role);
+        } else {
+            Role tRole = new Role("STUDENT");
+            roleRepository.save(tRole);
+            dto.addRoles(tRole);
+        }
         try {
             studentRepository.save(dto);
             logger.info("Student saved with ID: " + dto.getStudentId());
