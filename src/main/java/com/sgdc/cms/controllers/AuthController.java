@@ -58,7 +58,7 @@ public class AuthController {
         
         System.out.println("Got username: " + username);
         try {
-            username = studentService.findStudentByStudentId(id);
+            username = studentService.findStudentUsernameByStudentId(id);
             if(username == null) {
                 username = employeeService.findEmployeeByEmployeeId(id);
                 System.out.println("Emp: " + username);

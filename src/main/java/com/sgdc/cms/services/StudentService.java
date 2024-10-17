@@ -1,5 +1,7 @@
 package com.sgdc.cms.services;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -12,9 +14,7 @@ import com.sgdc.cms.models.StudentGroup;
 import com.sgdc.cms.repositories.RoleRepository;
 import com.sgdc.cms.repositories.StudentGroupRepository;
 import com.sgdc.cms.repositories.StudentRepository;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.sgdc.cms.security.jwt.JwtTokenProvider;
 
 @Service
 public class StudentService {
@@ -26,6 +26,8 @@ public class StudentService {
     private RoleRepository roleRepository;
     private StudentGroupRepository studentGroupRepo;
 
+    private JwtTokenProvider jwtTokenProvider;
+
     @Autowired
     public StudentService(StudentRepository repo, PasswordEncoder pwe, RoleRepository roleRepo,
             StudentGroupRepository sgr) {
@@ -34,15 +36,22 @@ public class StudentService {
         this.roleRepository = roleRepo;
         this.studentGroupRepo = sgr;
     }
+    
+    public Student findStudentByToken(String token) {
+        String username = this.jwtTokenProvider.getUsernameFromToken(token);
+        Student s = studentRepository.findByUsername(username).orElseThrow(
+            () -> new RuntimeException("Student not found")
+        );
+        return s;
+    }
 
-    public String findStudentByStudentId(String studentId) {
+    public String findStudentUsernameByStudentId(String studentId) {
         Student s = studentRepository.findByStudentId(studentId);
         if (s != null) {
             return s.getUsername();
         } else {
             return null;
         }
-
     }
 
     public Student saveStudent(StudentDto dto) {
@@ -60,18 +69,16 @@ public class StudentService {
             s.setSscYearOfPassing(dto.getSscYearOfPassing());
             s.setSscMarks(dto.getSscMarks());
 
-
             s.setIntermediateCollege(dto.getIntermediateCollege());
             s.setIntermediateYearOfPassing(dto.getIntermediateYearOfPassing());
             s.setIntermediateMarks(dto.getIntermediateMarks());
 
             s.setGuardianName(dto.getGuardianName());
-            s.setGuardianName(dto.getGuardianName());
             s.setGuardianPhone(dto.getGuardianPhone());
 
             s.setMotherAadhaar(dto.getMotherAadhaar());
             s.setStudentAadhaar(dto.getStudentAadhaar());
-            
+
             // logger.info("Student pass " + dto.getPassword());
 
             StudentGroup group = studentGroupRepo.findByGroupName(dto.getGroup());
@@ -103,4 +110,16 @@ public class StudentService {
             throw new RuntimeException(e);
         }
     }
+
+    
+
+    public JwtTokenProvider getJwtTokenProvider() {
+        return jwtTokenProvider;
+    }
+
+    @Autowired
+    public void setJwtTokenProvider(JwtTokenProvider jwtTokenProvider) {
+        this.jwtTokenProvider = jwtTokenProvider;
+    }
+
 }

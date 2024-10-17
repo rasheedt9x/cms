@@ -49,8 +49,7 @@ public class JwtTokenProvider {
         }
     }
 
-    public String getUsernameFromToken(String token) {
-    
+    public String getUsernameFromToken(String token) {    
         Claims claims = Jwts.parser()
                 .verifyWith(getSigningKey())
                 .build()

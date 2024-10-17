@@ -54,7 +54,7 @@ public class SecurityConfig {
 	        .requestMatchers("/","/auth/**", "/api/v1/applications/new").permitAll()
             // Allow ADMIN and ADMISSION_MANAGER to access specific API endpoints
             
-           .requestMatchers("/api/v1/students/get/**").hasRole("STUDENT")
+           .requestMatchers("/api/v1/students/get/**","/api/v1/students/ping").hasRole("STUDENT")
            .requestMatchers("/api/v1/applications/**").hasAnyRole("ADMISSION_MANAGER","ADMIN")                
             .requestMatchers("/api/v1/groups/**", "/api/v1/students/**", "/api/v1/applications/**", "/api/v1/dept/**", "/api/v1/employees/**")
             .hasRole("ADMIN")

@@ -221,7 +221,9 @@ public class ApplicationService {
 
         // Creating Student DTO from Application
         Student dto = new Student();
+        logger.info("Applicant name: "+ application.getName());
         dto.setName(application.getName());
+        logger.info("Student Name: "+dto.getName());
         dto.setUsername(application.getUsername());
         dto.setAddress(application.getAddress());
         dto.setYearOfStudy(1);

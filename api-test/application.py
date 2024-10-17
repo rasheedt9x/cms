@@ -11,32 +11,32 @@ main_url = "http://localhost:8080/api/v1/"
 # }
 
 
-r2 = requests.post(main_url + "applications/new",  json={
-    "name": "Rohini Mehta",
-    "email": "rohini.mehta123@gmail.com",
-    "nationality": "Indian",
-    "gender": "Female",
-    "address": "23 Juhu Beach Road, Mumbai",
-    "dateOfBirth": "09/11/2001",
-    "username": "rohinimehta01",
-    "primaryPhone": "+918877665544",
-    "secondaryPhone": "+918877665543",
-    "guardianName": "Suresh Mehta",
-    "guardianPhone": "08877665544",
-    "sscSchool": "Mumbai Central School",
-    "sscYearOfPassing": 2018,
-    "sscMarks": 90,
-    "intermediateCollege": "St. Xavier's College",
-    "intermediateYearOfPassing": 2020,
-    "intermediateMarks": 83,
-    "degreeCourse": "Biotech",
-    "secondLanguage": "Marathi",
-    "caste": "General",
-    "religion": "Hindu",
-    "studentAadhaar": "445566778899",
-    "motherAadhaar": "445566778900"
-  })
-print("r2", r2.status_code, r2.content)
+# r2 = requests.post(main_url + "applications/new",  json={
+#     "name": "Rohini Mehta",
+#     "email": "rohini.mehta123@gmail.com",
+#     "nationality": "Indian",
+#     "gender": "Female",
+#     "address": "23 Juhu Beach Road, Mumbai",
+#     "dateOfBirth": "09/11/2001",
+#     "username": "rohinimehta01",
+#     "primaryPhone": "+918877665544",
+#     "secondaryPhone": "+918877665543",
+#     "guardianName": "Suresh Mehta",
+#     "guardianPhone": "08877665544",
+#     "sscSchool": "Mumbai Central School",
+#     "sscYearOfPassing": 2018,
+#     "sscMarks": 90,
+#     "intermediateCollege": "St. Xavier's College",
+#     "intermediateYearOfPassing": 2020,
+#     "intermediateMarks": 83,
+#     "degreeCourse": "Biotech",
+#     "secondLanguage": "Marathi",
+#     "caste": "General",
+#     "religion": "Hindu",
+#     "studentAadhaar": "445566778899",
+#     "motherAadhaar": "445566778900"
+#   })
+# print("r2", r2.status_code, r2.content)
     
     
 login_url = 'http://localhost:8080/auth/login'
@@ -76,15 +76,15 @@ if response.status_code == 200:
 
     #Approve applications
     r1 = requests.post(main_url + "applications/SGDCAP1001/status", headers=headers, json={
-         "status": "REJECTED"
-    })
+          "status": "APPROVED"
+     })
     print("r1", r1.content)
     
-    #Get applications by Statusr
-    r1 = requests.get(main_url + "applications/all/status/PENDING", headers=headers)
-    print("r1", r1.content)
+    # #Get applications by Statusr
+    # r1 = requests.get(main_url + "applications/all/status/PENDING", headers=headers)
+    # print("r1", r1.content)
 
-    ##Application count by status    
+    # ##Application count by status    
     # r1 = requests.get(main_url + "applications/count/status",headers=headers, json={
     #                       "status": "PENDING"
     #                   })

@@ -21,8 +21,8 @@ public class Student extends User {
     // @GenericGenerator(name = "stu_id_gen",type = StudentIDGenerator.class)
     // @GeneratorType(type = StudentIDGenerator.class,when = GenerationTime.INSERT)
 
-	@Column(name = "student_name", nullable = false)
-	private String name;
+	// @Column(name = "student_name", nullable = false)
+	// private String name;
 
 	    
     @Column(name = "student_id")
@@ -72,15 +72,6 @@ public class Student extends User {
 	public void setAddress(String address) {
 		this.address = address;
 	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
 	public Date getDateOfBirth() {
 		return dateOfBirth;
 	}
