@@ -73,10 +73,10 @@ public class ApplicationController {
 		return ResponseEntity.ok(list);
 	}
 
-	@GetMapping(value = "/count/{status}", consumes = "application/json")
-	public ResponseEntity<?> findApplicationCountByStatus(@RequestBody Map<String, String> requestBody) {
-		ApplicationStatus status = ApplicationStatus.valueOf(requestBody.get("status"));
-		Long count = applicationService.getCountByStatus(status);
+	@GetMapping(value = "/count/{status}")
+	public ResponseEntity<?> findApplicationCountByStatus(@PathVariable("status") String status) {
+		ApplicationStatus appStatus = ApplicationStatus.valueOf(status);
+		Long count = applicationService.getCountByStatus(appStatus);
 		Map<String, Object> map = new HashMap<>();
 		map.put("count", count);
 		map.put("status",status.toString());

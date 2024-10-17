@@ -68,9 +68,7 @@ if response.status_code == 200:
     print("r1", r1.content)
     
     # #Get applications by Status
-    # r1 = requests.get(main_url + "applications/all/status", headers=headers, json={
-    #     "status": "APPROVED"
-    # })
+    # r1 = requests.get(main_url + "applications/all/APPROVED", headers=headers)
     # print("r1", r1.json())
 
     ##Application count by status    
