@@ -1,26 +1,16 @@
 package com.sgdc.cms.models;
 
-import org.hibernate.annotations.GenerationTime;
-import org.hibernate.annotations.GeneratorType;
-import org.hibernate.annotations.GenericGenerator;
+import java.util.Date;
 
 import com.sgdc.cms.annotations.CustomStudentID;
-import com.sgdc.cms.generators.StudentIDGenerator;
 
 import jakarta.persistence.Column;
-
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PrimaryKeyJoinColumn;
-import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 
 
 @Entity
@@ -31,7 +21,10 @@ public class Student extends User {
     // @GenericGenerator(name = "stu_id_gen",type = StudentIDGenerator.class)
     // @GeneratorType(type = StudentIDGenerator.class,when = GenerationTime.INSERT)
 
-    
+	@Column(name = "student_name", nullable = false)
+	private String name;
+
+	    
     @Column(name = "student_id")
     @CustomStudentID
     private String studentId;
@@ -43,7 +36,60 @@ public class Student extends User {
     @Column(name = "year_of_study")
     private int yearOfStudy;
 
-    @Column(name = "primary_phone")
+	@Temporal(TemporalType.DATE)
+	@Column(name = "date_of_birth")
+    private Date dateOfBirth;
+
+	@Column(name = "address")
+	private String address;
+
+	@Column(name = "gender")
+	private String gender;
+
+	@Column(name = "nationality")
+	private String nationality;
+
+    public String getNationality() {
+		return nationality;
+	}
+
+	public void setNationality(String nationality) {
+		this.nationality = nationality;
+	}
+
+	public String getGender() {
+		return gender;
+	}
+
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public Date getDateOfBirth() {
+		return dateOfBirth;
+	}
+
+	public void setDateOfBirth(Date dateOfBirth) {
+		this.dateOfBirth = dateOfBirth;
+	}
+
+	@Column(name = "primary_phone")
     private String primaryPhone;
 
     @Column(name = "secondary_phone")

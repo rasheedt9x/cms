@@ -9,7 +9,7 @@ public class ApplicationDto {
     private String nationality;
     private String gender;
     private String address;
-    private String  dateOfBirth;
+    private String dateOfBirth;
     private String username;
     private String primaryPhone;
     private String secondaryPhone;

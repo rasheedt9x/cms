@@ -62,10 +62,10 @@ if response.status_code == 200:
     
 
     #Approve applications
-    # r1 = requests.post(main_url + "applications/SGDCAP1002/status", headers=headers, json={
-    #     "status": "APPROVED"
-    # })
-    # print("r1", r1.content)
+    r1 = requests.post(main_url + "applications/SGDCAP1002/status", headers=headers, json={
+         "status": "APPROVED"
+    })
+    print("r1", r1.content)
     
     # #Get applications by Status
     # r1 = requests.get(main_url + "applications/all/status", headers=headers, json={

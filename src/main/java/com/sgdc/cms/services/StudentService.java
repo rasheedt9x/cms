@@ -51,10 +51,27 @@ public class StudentService {
             s.setName(dto.getName());
             s.setEmail(dto.getEmail());
             // s.setUsername(dto.getUsername());
-            s.setPassword(passwordEncoder.encode(dto.getPassword()));
+            s.setPassword(passwordEncoder.encode("SGDC@123"));
             s.setYearOfStudy(dto.getYearOfStudy());
-        
+            s.setCaste(dto.getCaste());
+            s.setEnabled(true);
 
+            s.setSscSchool(dto.getSscSchool());
+            s.setSscYearOfPassing(dto.getSscYearOfPassing());
+            s.setSscMarks(dto.getSscMarks());
+
+
+            s.setIntermediateCollege(dto.getIntermediateCollege());
+            s.setIntermediateYearOfPassing(dto.getIntermediateYearOfPassing());
+            s.setIntermediateMarks(dto.getIntermediateMarks());
+
+            s.setGuardianName(dto.getGuardianName());
+            s.setGuardianName(dto.getGuardianName());
+            s.setGuardianPhone(dto.getGuardianPhone());
+
+            s.setMotherAadhaar(dto.getMotherAadhaar());
+            s.setStudentAadhaar(dto.getStudentAadhaar());
+            
             // logger.info("Student pass " + dto.getPassword());
 
             StudentGroup group = studentGroupRepo.findByGroupName(dto.getGroup());

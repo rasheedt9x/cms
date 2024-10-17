@@ -106,13 +106,13 @@ public class ApplicationController {
 //	}
 
 	@PostMapping(value = "/{id}/status", consumes = "application/json")
-	public ResponseEntity<Application> updateApplicationStatus(
+	public ResponseEntity<?> updateApplicationStatus(
 			@PathVariable("id") String applicationId,
 			@RequestBody Map<String, String> requestBody
 	) {
 		ApplicationStatus status = ApplicationStatus.valueOf(requestBody.get("status"));
-		Application application = applicationService.updateStatus(applicationId, status);
-		return ResponseEntity.ok(application);
+		Map<String, Object> statusResponse = applicationService.updateStatus(applicationId, status);
+		return ResponseEntity.ok(statusResponse);
 	}
 
 
