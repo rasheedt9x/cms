@@ -9,5 +9,6 @@ import com.sgdc.cms.models.StudentGroup;
 @Repository
 public interface StudentGroupRepository extends JpaRepository<StudentGroup, Long> {
 
+    
     public StudentGroup findByGroupName(String groupName);
 }

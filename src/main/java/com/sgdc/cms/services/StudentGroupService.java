@@ -24,7 +24,7 @@ public class StudentGroupService {
 
     @PostConstruct
     public void initGroups() {
-        String[] groups = new String[] { "BCA", "BCOM", "BSC", "BZC", "BIOTECH" };
+        String[] groups = new String[] { "BCA", "BCOM", "BSC", "BZC", "BIOTECH","BBA" };
 
         for (String g : groups) {
             try {

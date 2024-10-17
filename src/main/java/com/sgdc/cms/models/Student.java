@@ -30,7 +30,7 @@ public class Student extends User {
     private String studentId;
 
     @ManyToOne
-    @JoinColumn(name = "group_id", nullable=false)    
+    @JoinColumn(name = "group_id", nullable = false)    
 	private StudentGroup group;
 
     @Column(name = "year_of_study")
