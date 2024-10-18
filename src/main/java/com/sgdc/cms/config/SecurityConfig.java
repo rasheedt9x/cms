@@ -51,7 +51,7 @@ public class SecurityConfig {
         http.authorizeHttpRequests(
             (request) -> {
 	            request            
-	        .requestMatchers("/","/auth/**", "/api/v1/applications/new").permitAll()
+	        .requestMatchers("/","/auth/**", "/api/v1/applications/new","/api/v1/book/**").permitAll()
             // Allow ADMIN and ADMISSION_MANAGER to access specific API endpoints
             
            .requestMatchers("/api/v1/students/get/**","/api/v1/students/ping").hasRole("STUDENT")
