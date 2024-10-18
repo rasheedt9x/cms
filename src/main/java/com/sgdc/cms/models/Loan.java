@@ -14,7 +14,7 @@ public class Loan {
     private Book book;
 
     @ManyToOne
-    @JoinColumn(name = "username")
+    @JoinColumn(name = "user_id")
     private User user;
 
     @Temporal(TemporalType.DATE)
@@ -29,7 +29,19 @@ public class Loan {
     @Column(name = "return_date")
     private LocalDate returnDate;
 
-    public Long getId() {
+    @Column(name = "approved")
+    private boolean approved = false;
+
+
+    public boolean isApproved() {
+		return approved;
+	}
+
+	public void setApproved(boolean approved) {
+		this.approved = approved;
+	}
+
+	public Long getId() {
         return id;
     }
 

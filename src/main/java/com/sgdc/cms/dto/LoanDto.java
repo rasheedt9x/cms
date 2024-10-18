@@ -1,23 +1,18 @@
 package com.sgdc.cms.dto;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class LoanDto {
     private Long id;
-    private String book;
-    private String username;
-    private LocalDate startDate;
-    private LocalDate dueDate;
-    private LocalDate returnDate;
+    private Long bookId;
+    private String collegeId;    
+	private String startDate;
+    private String dueDate;
+    private String returnDate;
+    private boolean loanApproved;
 
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
+    
     public Long getId() {
         return id;
     }
@@ -26,35 +21,44 @@ public class LoanDto {
         this.id = id;
     }
 
-    public String getBook() {
-        return book;
+    public Long getBookId() {
+        return bookId;
     }
 
-    public void setBook(String book) {
-        this.book = book;
+    public void setBook(Long bookId) {
+        this.bookId = bookId;
     }
 
-    public LocalDate getStartDate() {
+    public String getCollegeId() {
+		return collegeId;
+	}
+
+	public void setCollegeId(String collegeId) {
+		this.collegeId = collegeId;
+	}
+
+    public String getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(LocalDate startDate) {
+    public void setStartDate(String startDate) {
+        
         this.startDate = startDate;
     }
 
-    public LocalDate getDueDate() {
+    public String getDueDate() {
         return dueDate;
     }
 
-    public void setDueDate(LocalDate dueDate) {
+    public void setDueDate(String dueDate) {  
         this.dueDate = dueDate;
     }
 
-    public LocalDate getReturnDate() {
+    public String getReturnDate() {
         return returnDate;
     }
 
-    public void setReturnDate(LocalDate returnDate) {
+    public void setReturnDate(String returnDate) {
         this.returnDate = returnDate;
     }
 }

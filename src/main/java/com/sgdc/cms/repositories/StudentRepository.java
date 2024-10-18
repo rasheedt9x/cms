@@ -19,4 +19,9 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
   
     @Query("SELECT CASE WHEN COUNT(s) > 0 THEN true ELSE false END FROM Student s WHERE s.username = :username")
     boolean existsByUsername(@Param("username") String username);
+
+    
+    @Query("SELECT CASE WHEN COUNT(s) > 0 THEN true ELSE false END FROM Student s WHERE s.studentId = :studentId")
+    boolean existsByStudentId(@Param("studentId") String studentId);
+
 }
