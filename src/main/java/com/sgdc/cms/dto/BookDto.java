@@ -1,30 +1,20 @@
-package com.sgdc.cms.models;
+package com.sgdc.cms.dto;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 
-import jakarta.persistence.*;
-
-
-@Entity
-@Table(name = "books")
-public class Book {
-
-    @Id
-    @Column(name = "book_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class BookDto {
     private Long id;
-
-    @Column(name = "title")
     private String title;
-
-    @Column(name = "isbn")
     private String isbn;
-
-    @Column(name = "available_copies")
     private int availableCopies;
-
-    @Column(name = "total_copies")
     private int totalCopies;
 
+    public Long getId() {
+        return id;
+    }
 
     public void setId(Long id) {
         this.id = id;
@@ -54,7 +44,6 @@ public class Book {
         this.availableCopies = availableCopies;
     }
 
-
     public int getTotalCopies() {
         return totalCopies;
     }
@@ -63,15 +52,4 @@ public class Book {
         this.totalCopies = totalCopies;
     }
 
-    public int getAvailaleCopies() {
-        return availableCopies;
-    }
-
-    public void setAvailaleCopies(int availaleCopies) {
-        this.availableCopies = availaleCopies;
-    }
-
-    public Long getId() {
-        return id;
-    }
 }
