@@ -1,33 +1,22 @@
-package com.sgdc.cms.models;
+package com.sgdc.cms.dto;
 
-import jakarta.persistence.*;
 import java.time.LocalDate;
 
-@Entity
-public class Loan {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class LoanDto {
     private Long id;
-
-    @ManyToOne
-    @JoinColumn(name = "book_id")
-    private Book book;
-
-    @ManyToOne
-    @JoinColumn(name = "username")
-    private User user;
-
-    @Temporal(TemporalType.DATE)
-    @Column(name = "start_date")
+    private String book;
+    private String username;
     private LocalDate startDate;
-
-    @Temporal(TemporalType.DATE)
-    @Column(name = "due_date")
     private LocalDate dueDate;
-
-    @Temporal(TemporalType.DATE)
-    @Column(name = "return_date")
     private LocalDate returnDate;
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
     public Long getId() {
         return id;
@@ -37,21 +26,12 @@ public class Loan {
         this.id = id;
     }
 
-    public Book getBook() {
+    public String getBook() {
         return book;
     }
 
-
-    public void setBook(Book book) {
+    public void setBook(String book) {
         this.book = book;
-    }
-
-    public User getUsername() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 
     public LocalDate getStartDate() {
