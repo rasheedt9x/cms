@@ -3,6 +3,7 @@ package com.sgdc.cms.services;
 import com.sgdc.cms.dto.BookDto;
 import com.sgdc.cms.dto.LoanDto;
 import com.sgdc.cms.models.Book;
+import com.sgdc.cms.models.Employee;
 import com.sgdc.cms.models.Loan;
 import com.sgdc.cms.repositories.BookRepository;
 import com.sgdc.cms.repositories.EmployeeRepository;
@@ -12,6 +13,8 @@ import com.sgdc.cms.security.jwt.JwtTokenProvider;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,6 +93,27 @@ public class LoanService {
         loan.setApproved(false);
         logger.info("Loan request processed successfully for book ID: {}", loanDto.getBookId());
         return loanDto;
+    }
+
+    public List<LoanDto> retrieveAllLoanApplications() {
+        List<Loan> loans = loanRepository.findAll();
+        return loans.stream()
+                    .map(loan -> {
+                        LoanDto dto = new LoanDto();
+                        dto.setId(loan.getId());
+                        dto.setBook(loan.getBook().getId());
+                        dto.setBookTitle(loan.getBook().getTitle());
+                        return dto;
+                    }).collect(Collectors.toList());
+    }
+
+    public boolean isLibrarian(String token){
+        String username = jwtTokenProvider.getUsernameFromToken(token);
+        Employee e = employeeRepository.findByUsername(username).orElseThrow(
+            () -> new RuntimeException("Couldnt approve loan -> checking librarian -> not an employee")            
+        );
+        boolean isLibrarian = e.getRoles().stream().anyMatch(role -> role.getRolename().equals("ROLE_LIBRARIAN"));
+        return isLibrarian;
     }
 
     public StudentRepository getStudentRepository() {

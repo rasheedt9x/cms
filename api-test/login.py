@@ -26,7 +26,7 @@ def admin():
     r1 = requests.get(main_url + "students/get/self", headers=headers)
     print(r1.content)
 
-    
+    print("JWT Token: ", jwt_token)
 
     # r2 = requests.post(logout_url,headers=headers)
     # print(r2.content)

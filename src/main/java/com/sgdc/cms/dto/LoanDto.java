@@ -1,19 +1,33 @@
 package com.sgdc.cms.dto;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-
 public class LoanDto {
     private Long id;
     private Long bookId;
-    private String collegeId;    
+    private String bookTitle;
+    public String getBookTitle() {
+		return bookTitle;
+	}
+
+	public void setBookTitle(String bookTitle) {
+		this.bookTitle = bookTitle;
+	}
+
+	private String collegeId;    
 	private String startDate;
     private String dueDate;
     private String returnDate;
     private boolean loanApproved;
 
     
-    public Long getId() {
+    public boolean isLoanApproved() {
+		return loanApproved;
+	}
+
+	public void setLoanApproved(boolean loanApproved) {
+		this.loanApproved = loanApproved;
+	}
+
+	public Long getId() {
         return id;
     }
 

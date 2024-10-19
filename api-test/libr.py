@@ -22,7 +22,18 @@ def library():
         "bookId" : 1,
     }
 
+    print("JWT Token: ", jwt_token)
     r1 = requests.post(main_url + "bookloan/request",headers=headers,json=dto)
     print(r1.content)
+
+    print("JWT Token: ", jwt_token)
+    r1 = requests.get(main_url + "bookloan/all",headers=headers)
+    print(r1.content)
+
+    print("JWT Token: ", jwt_token)
+
+    r1 = requests.post(main_url + "bookloan/approve",headers=headers)
+    print(r1.content)
+    
 
 library()
