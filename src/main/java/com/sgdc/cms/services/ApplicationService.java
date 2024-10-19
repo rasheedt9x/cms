@@ -268,11 +268,11 @@ public class ApplicationService {
 
         Role role = roleRepository.findByRoleName("STUDENT");
         if (role != null) {
-            dto.addRoles(role);
+            dto.addRole(role);
         } else {
             Role tRole = new Role("STUDENT");
             roleRepository.save(tRole);
-            dto.addRoles(tRole);
+            dto.addRole(tRole);
         }
         try {
             studentRepository.save(dto);

@@ -58,7 +58,9 @@ public class User extends Person{
         return this.roles;
     }
 
-    public void addRoles(Role role){
+    
+
+    public void addRole(Role role){
         this.roles.add(role);
     }
 }

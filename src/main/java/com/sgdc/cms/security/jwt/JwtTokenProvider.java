@@ -5,6 +5,8 @@ import java.util.Date;
 
 import javax.crypto.SecretKey;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Claims;
@@ -15,6 +17,7 @@ import jakarta.servlet.http.HttpServletRequest;
 @Component
 public class JwtTokenProvider {
 
+    private final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
     private final String SECRET_KEY = "BhdY1CbaqhYMNaP2QRnJry7ok4H6vv6C";
 
     public String generateToken(String username) {
@@ -49,13 +52,22 @@ public class JwtTokenProvider {
         }
     }
 
-    public String getUsernameFromToken(String token) {    
+    public String getUsernameFromToken(String token) {
+        logger.info("Token received to get Username: " + token);
+        try {
+        	
         Claims claims = Jwts.parser()
                 .verifyWith(getSigningKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
-        return claims.getSubject();
+            return claims.getSubject();
+        } catch (Exception  e ) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        	// TODO: handle exception
+        }    
+            
     }
 
     

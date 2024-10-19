@@ -5,6 +5,7 @@ import com.sgdc.cms.dto.LoanDto;
 import com.sgdc.cms.models.Book;
 import com.sgdc.cms.models.Employee;
 import com.sgdc.cms.models.Loan;
+import com.sgdc.cms.models.Role;
 import com.sgdc.cms.repositories.BookRepository;
 import com.sgdc.cms.repositories.EmployeeRepository;
 import com.sgdc.cms.repositories.LoanRepository;
@@ -108,11 +109,13 @@ public class LoanService {
     }
 
     public boolean isLibrarian(String token){
-        String username = jwtTokenProvider.getUsernameFromToken(token);
-        Employee e = employeeRepository.findByUsername(username).orElseThrow(
-            () -> new RuntimeException("Couldnt approve loan -> checking librarian -> not an employee")            
-        );
-        boolean isLibrarian = e.getRoles().stream().anyMatch(role -> role.getRolename().equals("ROLE_LIBRARIAN"));
+        String username = jwtTokenProvider.getUsernameFromToken(token);       
+        Employee e = employeeRepository.findByUsername(username).get();
+        logger.info("IsLibrarian -> Username: "+ e.getEmployeeId());
+        // for(Role r : e.getRoles()) {
+        //     logger.info(r.getRolename());
+        // }
+        boolean isLibrarian = e.getRoles().stream().anyMatch(role -> role.getRolename().equals("LIBRARIAN"));
         return isLibrarian;
     }
 

@@ -15,10 +15,9 @@ import com.sgdc.cms.repositories.EmployeeRepository;
 import com.sgdc.cms.repositories.RoleRepository;
 
 import jakarta.annotation.PostConstruct;
+import java.util.HashSet;
+import java.util.Set;
 
-/**
- * EmployeeService
- */
 @Service
 public class EmployeeService {
 
@@ -30,111 +29,61 @@ public class EmployeeService {
 
     @Autowired
     public EmployeeService(EmployeeRepository empRepo, PasswordEncoder pwe, RoleRepository roleRepo,
-            DepartmentRepository dRepo) {
+                           DepartmentRepository dRepo) {
         this.employeeRepository = empRepo;
         this.passwordEncoder = pwe;
         this.roleRepository = roleRepo;
         this.departmentRepository = dRepo;
-
     }
 
     @PostConstruct
     public void initAdmins() {
         try {
-            if (employeeRepository.existsByUsername("admin") && employeeRepository.existsByUsername("adm_admin")) {
-                return;
-            }
-            Employee e = new Employee();
-            e.setName("ADMISSION_ADMIN");
-            e.setEmail("adm_admin@example.com");
-            e.setUsername("adm_admin");
-            e.setPassword(passwordEncoder.encode("1234"));
-
-            Role role = roleRepository.findByRoleName("ADMISSION_MANAGER");
-            if (role != null) {
-                e.addRoles(role);
-            } else {
-                Role tRole = new Role("ADMISSION_MANAGER");
-                roleRepository.save(tRole);
-                e.addRoles(tRole);
-            }
-
-            logger.info("Init Admins");
-            Department dept = departmentRepository.findByDepartmentName("MANAGEMENT");
-            if (dept != null) {
-                e.setDepartment(dept);
-            } else {
-                Department d = new Department();
-                d.setDepartmentName("MANAGEMENT");
-                departmentRepository.save(d);
-                e.setDepartment(d);
-            }
-
-            employeeRepository.save(e);
-//--------------------------------------------------------
-            Employee e1 = new Employee();
-            e1.setName("ADMIN");
-            e1.setEmail("admin@example.com");
-            e1.setUsername("admin");
-            e1.setPassword(passwordEncoder.encode("1234"));
-
-            Role role1 = roleRepository.findByRoleName("ADMIN");
-            if (role1 != null) {
-                e.addRoles(role1);
-            } else {
-                Role tRole1 = new Role("ADMIN");
-                roleRepository.save(tRole1);
-                e1.addRoles(tRole1);
-            }
-
-            logger.info("Init Admins");
-            Department dept1 = departmentRepository.findByDepartmentName("MANAGEMENT");
-            if (dept1 != null) {
-                e1.setDepartment(dept1);
-            } else {
-                Department d1 = new Department();
-                d1.setDepartmentName("MANAGEMENT");
-                departmentRepository.save(d1);
-                e1.setDepartment(d1);
-            }
-
-            employeeRepository.save(e1);
-
+            createAdminIfNotExists("adm_admin", "ADMISSION_ADMIN", "adm_admin@example.com", new String[]{"ADMISSION_MANAGER"});
+            createAdminIfNotExists("admin", "ADMIN", "admin@example.com", new String[]{"ADMIN"});
+    	    createAdminIfNotExists("libr123","LIBRARIAN","librarian@example.com",new String[]{"LIBRARIAN"});
         } catch (Exception ex) {
             logger.error("Error during PostConstruct initialization: ", ex);
-        }
+	    }
     }
 
-    // @PostConstruct
-    // public void initAdmins() {
+    private void createAdminIfNotExists(String username, String name, String email, String[] roleNames) {
+        if (employeeRepository.existsByUsername(username)) {
+            return; // Admin already exists
+        }
 
-    // Employee e = new Employee();
-    // e.setName("ADMIN");
-    // e.setEmail("admin@example.com");
-    // e.setUsername("admin");
-    // e.setPassword(passwordEncoder.encode("1234"));
+        Employee employee = new Employee();
+        employee.setName(name);
+        employee.setEmail(email);
+        employee.setUsername(username);
+        employee.setPassword(passwordEncoder.encode("1234"));
 
-    // Role role = roleRepository.findByRoleName("EMPLOYEE");
-    // if (role != null) {
-    // e.addRoles(role);
-    // } else {
-    // Role tRole = new Role("EMPLOYEE");
-    // roleRepository.save(tRole);
-    // e.addRoles(tRole);
-    // }
+        Set<Role> roles = new HashSet<>();
+        for (String roleName : roleNames) {
+            Role role = roleRepository.findByRoleName(roleName);
+            if (role == null) {
+                role = new Role(roleName);
+                roleRepository.save(role);
+            }
+            roles.add(role);
+        }
 
-    // logger.info("Init Admins");
-    // Department dept = departmentRepository.findByDepartmentName("ADMIN");
-    // if (dept != null) {
-    // e.setDepartment(dept);
-    // } else {
-    // Department d = new Department();
-    // d.setDepartmentName("ADMIN");
-    // departmentRepository.save(d);
-    // }
+        for(Role r : roles) {
+            r.setRolename(r.getRolename());
+            employee.addRole(r);
+        }
+        logger.info("Creating admin user: {}", username);
+        Department dept = departmentRepository.findByDepartmentName("MANAGEMENT");
+        if (dept == null) {
+            dept = new Department();
+            dept.setDepartmentName("MANAGEMENT");
+            departmentRepository.save(dept);
+        }
+        employee.setDepartment(dept);
 
-    // employeeRepository.save(e);
-    // }
+        employeeRepository.save(employee);
+        logger.info("Admin user created: {}", username);
+    }
 
     public Employee saveEmployee(EmployeeDto dto) {
         try {
@@ -146,14 +95,14 @@ public class EmployeeService {
 
             Role role = roleRepository.findByRoleName("EMPLOYEE");
             if (role != null) {
-                e.addRoles(role);
+                e.addRole(role);
             } else {
                 Role tRole = new Role("EMPLOYEE");
                 roleRepository.save(tRole);
-                e.addRoles(tRole);
+                e.addRole(tRole);
             }
 
-            logger.info(dto.getDepartmentName());
+            logger.info("Department name: {}", dto.getDepartmentName());
             Department dept = departmentRepository.findByDepartmentName(dto.getDepartmentName());
             if (dept != null) {
                 e.setDepartment(dept);
@@ -164,7 +113,7 @@ public class EmployeeService {
             return employeeRepository.save(e);
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("Couldnt save employee", e);
+            throw new RuntimeException("Couldn't save employee", e);
         }
     }
 
@@ -177,3 +126,4 @@ public class EmployeeService {
         }
     }
 }
+

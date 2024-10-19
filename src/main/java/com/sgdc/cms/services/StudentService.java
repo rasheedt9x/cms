@@ -91,11 +91,11 @@ public class StudentService {
 
             Role role = roleRepository.findByRoleName("STUDENT");
             if (role != null) {
-                s.addRoles(role);
+                s.addRole(role);
             } else {
                 Role tRole = new Role("STUDENT");
                 roleRepository.save(tRole);
-                s.addRoles(tRole);
+                s.addRole(tRole);
             }
 
             if (studentRepository.existsByUsername(dto.getUsername())) {

@@ -56,13 +56,15 @@ public class LoanController {
         String token = req.getHeader("Authorization");
         logger.info("Approving loan with token: {}", token);
 
-        if (token == null || !loanService.isLibrarian(token.substring(7))) {
+        logger.info(token.substring(7));
+        
+        if (!loanService.isLibrarian(token.substring(7))) {
             logger.error("Could not approve loan -> Employee is not a librarian or token is missing");
             throw new RuntimeException("Could not approve loan -> Employee is not a librarian");
         }
 
         logger.info("Loan approved successfully");
-        return ResponseEntity.ok("");
+        return ResponseEntity.ok("Loan approved");
     }
 }
 
