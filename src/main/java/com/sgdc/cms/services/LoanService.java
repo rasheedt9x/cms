@@ -5,6 +5,7 @@ import com.sgdc.cms.dto.LoanDto;
 import com.sgdc.cms.models.Book;
 import com.sgdc.cms.models.Employee;
 import com.sgdc.cms.models.Loan;
+import com.sgdc.cms.models.LoanStatus;
 import com.sgdc.cms.models.Role;
 import com.sgdc.cms.repositories.BookRepository;
 import com.sgdc.cms.repositories.EmployeeRepository;
@@ -20,6 +21,8 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -33,7 +36,11 @@ public class LoanService {
     private StudentRepository studentRepository;
     private EmployeeRepository employeeRepository;
 
-    public LoanService(LoanRepository lr, BookRepository br) {
+
+    private ApplicationEventPublisher eventPublisher;
+
+    
+	public LoanService(LoanRepository lr, BookRepository br) {
         this.loanRepository = lr;
         this.bookRepository = br;
     }
@@ -67,10 +74,11 @@ public class LoanService {
         }
 
         loan.setBook(book);
+        loan.setLoanStatus(LoanStatus.PENDING_APPROVAL);
         loan.setStartDate(null);
         loan.setDueDate(null);
         loan.setReturnDate(null);
-
+        
         try {
             loan = loanRepository.save(loan);
             logger.info("Loan application saved successfully with ID: {}", loan.getId());
@@ -91,7 +99,7 @@ public class LoanService {
         loanDto.setId(loan.getId());
         loanDto.setStartDate(null);
         loanDto.setReturnDate(null);
-        loan.setApproved(false);
+        loanDto.setLoanStatus(LoanStatus.PENDING_APPROVAL.toString());
         logger.info("Loan request processed successfully for book ID: {}", loanDto.getBookId());
         return loanDto;
     }
@@ -99,24 +107,100 @@ public class LoanService {
     public List<LoanDto> retrieveAllLoanApplications() {
         List<Loan> loans = loanRepository.findAll();
         return loans.stream()
-                    .map(loan -> {
-                        LoanDto dto = new LoanDto();
-                        dto.setId(loan.getId());
-                        dto.setBook(loan.getBook().getId());
-                        dto.setBookTitle(loan.getBook().getTitle());
-                        return dto;
-                    }).collect(Collectors.toList());
+                .map(loan -> {
+                    // LoanDto dto = new LoanDto();
+                    // dto.setId(loan.getId());
+                    // dto.setBook(loan.getBook().getId());
+                    // dto.setBookTitle(loan.getBook().getTitle());
+                    return createLoanDtoFromLoan(loan);
+                }).collect(Collectors.toList());
     }
 
-    public boolean isLibrarian(String token){
-        String username = jwtTokenProvider.getUsernameFromToken(token);       
+    public LoanDto approveLoan(Long id) {
+        Loan loan = loanRepository.findById(id).orElseThrow(
+                () -> new RuntimeException("Couldnt approve loan -> loan approval -> loan details not found"));
+
+        if (loan.getLoanStatus() != LoanStatus.PENDING_APPROVAL) {
+            throw new RuntimeException("Couldnt approve loan as its not pending approval");
+        }
+        loan.setStartDate(LocalDate.now());
+        loan.setDueDate(LocalDate.now().plusDays(28));
+        loan.setLoanStatus(LoanStatus.APPROVED);
+        try {
+            loan = loanRepository.save(loan);
+        } catch (Exception e) {
+            throw new RuntimeException("Couldnt approve loan -> error while saving loan application");
+        }
+        return createLoanDtoFromLoan(loan);
+    }
+
+    public LoanDto createLoanDtoFromLoan(Loan loan) {
+        LoanDto loanDto = new LoanDto();
+        loanDto.setId(loan.getId());
+        loanDto.setBook(loan.getBook().getId());
+        loanDto.setBookTitle(loan.getBook().getTitle());
+        loanDto.setStartDate(loan.getStartDate() != null ? loan.getStartDate().toString() : null);
+        loanDto.setDueDate(loan.getDueDate() != null ? loan.getDueDate().toString() : null);
+        loanDto.setReturnDate(loan.getReturnDate() != null ? loan.getReturnDate().toString() : null);
+        loanDto.setLoanStatus(loan.getLoanStatus().toString());
+
+        return loanDto;
+    }
+
+    public boolean isLibrarian(String token) {
+        String username = jwtTokenProvider.getUsernameFromToken(token);
         Employee e = employeeRepository.findByUsername(username).get();
-        logger.info("IsLibrarian -> Username: "+ e.getEmployeeId());
+        logger.info("IsLibrarian -> Username: " + e.getEmployeeId());
         // for(Role r : e.getRoles()) {
-        //     logger.info(r.getRolename());
+        // logger.info(r.getRolename());
         // }
         boolean isLibrarian = e.getRoles().stream().anyMatch(role -> role.getRolename().equals("LIBRARIAN"));
         return isLibrarian;
+    }
+
+    public void addReturnRequest(Long id) {
+        Loan loan = loanRepository.findById(id).orElseThrow(
+                () -> new RuntimeException("Loan return request -> book loan not found"));
+        loan.setLoanStatus(LoanStatus.RETURN_REQUESTED);
+        try {
+            loanRepository.save(loan);
+        } catch (Exception e) {
+            throw new RuntimeException("Couldnt request return -> FAILED");
+        }
+    }
+
+    public void approveReturn(Long loanId) {
+        Loan loan = loanRepository.findById(loanId)
+                .orElseThrow(() -> new RuntimeException("Loan not found for return approval"));
+
+        if (loan.getLoanStatus() != LoanStatus.RETURN_REQUESTED) {
+            throw new RuntimeException("Loan is not in a return-requested state");
+        }
+
+        loan.setLoanStatus(LoanStatus.RETURNED);
+        loan.setReturnDate(LocalDate.now());
+
+        
+        Book book = loan.getBook();
+        book.setAvailableCopies(book.getAvailableCopies() + 1);
+        bookRepository.save(book);
+
+        loanRepository.save(loan);
+    }
+
+    @Scheduled(cron = "0 0 0 * * ?")
+    public void overdueLoans() {
+        checkForOverdueLoans();
+    }
+
+    public void checkForOverdueLoans() {
+        List<Loan> loans = loanRepository.findAll();
+        for (Loan loan : loans) {
+            if (loan.isOverdue()) {
+                loan.setLoanStatus(LoanStatus.OVERDUE);
+                loanRepository.save(loan); 
+            }
+        }
     }
 
     public StudentRepository getStudentRepository() {
@@ -145,4 +229,17 @@ public class LoanService {
     public void setJwtTokenProvider(JwtTokenProvider jwtTokenProvider) {
         this.jwtTokenProvider = jwtTokenProvider;
     }
+
+
+    
+    
+    public ApplicationEventPublisher getEventPublisher() {
+		return eventPublisher;
+	}
+
+    @Autowired
+	public void setEventPublisher(ApplicationEventPublisher eventPublisher) {
+		this.eventPublisher = eventPublisher;
+	}
+
 }

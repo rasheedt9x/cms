@@ -2,16 +2,28 @@ import requests
 login_url = 'http://localhost:8080/auth/login'
 logout_url = 'http://localhost:8080/auth/logout'
 main_url = "http://localhost:8080/api/v1/"
-jwt_token = None
+libr_jwt_token = None
 
 def library():
-    login_data = {"username": "EM60000003", "password": "1234"}
-    response = requests.post(login_url, json=login_data)
+    stud_login_data = {"username": "ST70000001", "password": "SGDC@123"}
+    libr_login_data = {"username": "EM60000003", "password": "1234"}
+    
+    response = requests.post(login_url, json=libr_login_data)
     print(response.json())
-    jwt_token = response.json().get('token')
+    libr_jwt_token = response.json().get('token')
+
+    
+    response = requests.post(login_url, json=stud_login_data)
+    print(response.json())
+    stud_jwt_token = response.json().get('token')
+
+    stud_headers = {
+        "Authorization": f"Bearer {stud_jwt_token}",
+        "Content-Type": "application/json"
+    }
     
     headers = {
-        "Authorization": f"Bearer {jwt_token}",
+        "Authorization": f"Bearer {libr_jwt_token}",
         "Content-Type": "application/json"
     }
 
@@ -19,13 +31,22 @@ def library():
         "bookId" : 1,
     }
 
-    r1 = requests.post(main_url + "bookloan/request",headers=headers,json=dto)
-    print(r1.content)
+    # r1 = requests.post(main_url + "bookloan/request",headers=stud_headers,json=dto)
+    # print(r1.content)
 
     r1 = requests.get(main_url + "bookloan/all",headers=headers)
     print(r1.content)
 
-    r1 = requests.post(main_url + "bookloan/approve",headers=headers)
-    print(r1.content)
+    # r1 = requests.post(main_url + "bookloan/approve/1",headers=headers)
+    # print(r1.content)
+
+    # r1 = requests.post(main_url + "bookloan/return/1",headers=stud_headers)
+    # print(r1.content)
+
+    
+    # r1 = requests.post(main_url + "bookloan/approveReturn/1",headers=headers)
+    # print(r1.content)
+
+    
     
 library()

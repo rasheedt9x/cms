@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Entity
+@Table(name = "loans")
 public class Loan {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,16 +30,17 @@ public class Loan {
     @Column(name = "return_date")
     private LocalDate returnDate;
 
-    @Column(name = "approved")
-    private boolean approved = false;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "loan_status")
+    private LoanStatus loanStatus;
 
-
-    public boolean isApproved() {
-		return approved;
+    
+    public LoanStatus getLoanStatus() {
+		return loanStatus;
 	}
 
-	public void setApproved(boolean approved) {
-		this.approved = approved;
+	public void setLoanStatus(LoanStatus loanStatus) {
+		this.loanStatus = loanStatus;
 	}
 
 	public Long getId() {
@@ -88,5 +90,9 @@ public class Loan {
 
     public void setReturnDate(LocalDate returnDate) {
         this.returnDate = returnDate;
+    }
+
+    public boolean isOverdue() {
+        return (loanStatus == LoanStatus.APPROVED) && (dueDate != null && dueDate.isAfter(LocalDate.now()));
     }
 }

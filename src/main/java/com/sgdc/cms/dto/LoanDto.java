@@ -4,27 +4,28 @@ public class LoanDto {
     private Long id;
     private Long bookId;
     private String bookTitle;
+    private String collegeId;
+
+	private String startDate;
+
+	private String dueDate;    
+	private String returnDate;
+    private String loanStatus;
+    
     public String getBookTitle() {
 		return bookTitle;
 	}
-
-	public void setBookTitle(String bookTitle) {
+    public void setBookTitle(String bookTitle) {
 		this.bookTitle = bookTitle;
 	}
 
-	private String collegeId;    
-	private String startDate;
-    private String dueDate;
-    private String returnDate;
-    private boolean loanApproved;
-
     
-    public boolean isLoanApproved() {
-		return loanApproved;
+    public String getLoanStatus() {
+		return loanStatus;
 	}
 
-	public void setLoanApproved(boolean loanApproved) {
-		this.loanApproved = loanApproved;
+	public void setLoanStatus(String loanStatus) {
+		this.loanStatus = loanStatus;
 	}
 
 	public Long getId() {
