@@ -55,10 +55,10 @@ public class SecurityConfig {
             // Allow ADMIN and ADMISSION_MANAGER to access specific API endpoints
             
           .requestMatchers("/api/v1/book/all").hasAnyRole("STUDENT","ADMIN","EMPLOYEE","LIBRARIAN")                
-           .requestMatchers("/api/v1/book/**").hasAnyRole("LIBRARIAN","ADMIN")
-           .requestMatchers("/api/v1/students/get/**","/api/v1/students/ping").hasRole("STUDENT")
+           .requestMatchers("/api/v1/book/**").hasAnyRole("LIBRARIAN","ADMIN")         
+           .requestMatchers("/api/v1/students/get/**","/api/v1/students/ping").hasRole("STUDENT")            
+           .requestMatchers("/api/v1/employees/get/**").hasRole("EMPLOYEE")
            .requestMatchers("/api/v1/applications/**").hasAnyRole("ADMISSION_MANAGER","ADMIN")
-           
            .requestMatchers("/api/v1/groups/**", "/api/v1/students/**", "/api/v1/applications/**", "/api/v1/dept/**", "/api/v1/employees/**")
             .hasRole("ADMIN")
            .anyRequest().authenticated(); // This should be the last statement

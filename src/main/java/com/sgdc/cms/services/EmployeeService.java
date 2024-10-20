@@ -13,6 +13,7 @@ import com.sgdc.cms.models.Role;
 import com.sgdc.cms.repositories.DepartmentRepository;
 import com.sgdc.cms.repositories.EmployeeRepository;
 import com.sgdc.cms.repositories.RoleRepository;
+import com.sgdc.cms.security.jwt.JwtTokenProvider;
 
 import jakarta.annotation.PostConstruct;
 import java.util.HashSet;
@@ -26,6 +27,7 @@ public class EmployeeService {
     private PasswordEncoder passwordEncoder;
     private RoleRepository roleRepository;
     private DepartmentRepository departmentRepository;
+    private JwtTokenProvider jwtTokenProvider;
 
     @Autowired
     public EmployeeService(EmployeeRepository empRepo, PasswordEncoder pwe, RoleRepository roleRepo,
@@ -36,15 +38,74 @@ public class EmployeeService {
         this.departmentRepository = dRepo;
     }
 
+	public JwtTokenProvider getJwtTokenProvider() {
+		return jwtTokenProvider;
+	}
+
+    @Autowired
+	public void setJwtTokenProvider(JwtTokenProvider jwtTokenProvider) {
+		this.jwtTokenProvider = jwtTokenProvider;
+	}
+
     @PostConstruct
     public void initAdmins() {
         try {
-            createAdminIfNotExists("adm_admin", "ADMISSION_ADMIN", "adm_admin@example.com", new String[]{"ADMISSION_MANAGER"});
-            createAdminIfNotExists("admin", "ADMIN", "admin@example.com", new String[]{"ADMIN"});
-    	    createAdminIfNotExists("libr123","LIBRARIAN","librarian@example.com",new String[]{"LIBRARIAN"});
+            createAdminIfNotExists("adm_admin", "ADMISSION_ADMIN", "adm_admin@example.com", new String[]{"ADMISSION_MANAGER","EMPLOYEE"});
+            createAdminIfNotExists("admin", "ADMIN", "admin@example.com", new String[]{"ADMIN","EMPLOYEE"});
+    	    createAdminIfNotExists("libr123","LIBRARIAN","librarian@example.com",new String[]{"LIBRARIAN","EMPLOYEE"});
         } catch (Exception ex) {
             logger.error("Error during PostConstruct initialization: ", ex);
 	    }
+    }
+
+    public Employee saveEmployee(EmployeeDto dto) {
+        try {
+            Employee e = new Employee();
+            e.setName(dto.getName());
+            e.setEmail(dto.getEmail());
+            e.setUsername(dto.getUsername());
+            e.setPassword(passwordEncoder.encode("1234"));
+
+            Role role = roleRepository.findByRoleName("EMPLOYEE");
+            if (role != null) {
+                e.addRole(role);
+            } else {
+                Role tRole = new Role("EMPLOYEE");
+                roleRepository.save(tRole);
+                e.addRole(tRole);
+            }
+
+            logger.info("Department name: {}", dto.getDepartmentName());
+            Department dept = departmentRepository.findByDepartmentName(dto.getDepartmentName());
+            if (dept != null) {
+                e.setDepartment(dept);
+            } else {
+                throw new RuntimeException("Department not found");
+            }
+
+            return employeeRepository.save(e);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Couldn't save employee", e);
+        }
+    }
+
+
+    public EmployeeDto retrieveEmployeeByToken(String token) {
+        String username = jwtTokenProvider.getUsernameFromToken(token);
+        Employee e = employeeRepository.findByUsername(username).orElseThrow(
+            () -> new RuntimeException("Couldnt find employee with provided auth")
+        );
+        return convertToDto(e);
+    }
+
+    public String findEmployeeByEmployeeId(String employeeId) {
+        Employee e = employeeRepository.findByEmployeeId(employeeId);
+        if (e != null) {
+            return e.getUsername();
+        } else {
+            return null;
+        }
     }
 
     private void createAdminIfNotExists(String username, String name, String email, String[] roleNames) {
@@ -85,45 +146,25 @@ public class EmployeeService {
         logger.info("Admin user created: {}", username);
     }
 
-    public Employee saveEmployee(EmployeeDto dto) {
-        try {
-            Employee e = new Employee();
-            e.setName(dto.getName());
-            e.setEmail(dto.getEmail());
-            e.setUsername(dto.getUsername());
-            e.setPassword(passwordEncoder.encode("1234"));
+    public EmployeeDto convertToDto(Employee employee) {
+        EmployeeDto employeeDto = new EmployeeDto();
+       employeeDto.setName(employee.getName());                     
+        employeeDto.setEmail(employee.getEmail());                   
+        employeeDto.setUsername(employee.getUsername());             
+        employeeDto.setDepartmentName(employee.getDepartment() != null ? employee.getDepartment().getDepartmentName() : null);
+        
+        employeeDto.setNationality(employee.getNationality());       
+        employeeDto.setGender(employee.getGender());                 
+        employeeDto.setAddress(employee.getAddress());               
+        employeeDto.setDateOfBirth(employee.getDateOfBirth() != null? employee.getDateOfBirth().toString(): null);      
+        
+        
+        employeeDto.setDateOfJoining(employee.getDateOfJoining() != null? employee.getDateOfJoining().toString(): null);   
+        employeeDto.setDateOfLeaving(employee.getDateOfLeaving() != null? employee.getDateOfLeaving().toString(): null);   
 
-            Role role = roleRepository.findByRoleName("EMPLOYEE");
-            if (role != null) {
-                e.addRole(role);
-            } else {
-                Role tRole = new Role("EMPLOYEE");
-                roleRepository.save(tRole);
-                e.addRole(tRole);
-            }
-
-            logger.info("Department name: {}", dto.getDepartmentName());
-            Department dept = departmentRepository.findByDepartmentName(dto.getDepartmentName());
-            if (dept != null) {
-                e.setDepartment(dept);
-            } else {
-                throw new RuntimeException("Department not found");
-            }
-
-            return employeeRepository.save(e);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Couldn't save employee", e);
-        }
+        employeeDto.setEmployeeId(employee.getEmployeeId());         
+        return employeeDto;
     }
 
-    public String findEmployeeByEmployeeId(String employeeId) {
-        Employee e = employeeRepository.findByEmployeeId(employeeId);
-        if (e != null) {
-            return e.getUsername();
-        } else {
-            return null;
-        }
-    }
 }
 
