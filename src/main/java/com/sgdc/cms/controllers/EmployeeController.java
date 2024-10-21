@@ -3,6 +3,7 @@ package com.sgdc.cms.controllers;
 import java.security.Principal;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -42,7 +43,7 @@ public class EmployeeController {
 
     @PostMapping("/new")    
 	public ResponseEntity<?> newEmployee(@RequestBody EmployeeDto dto) {
-	    Object object = employeeService.saveEmployee(dto);
-	    return ResponseEntity.ok(object.toString());
+	    EmployeeDto object = employeeService.saveEmployee(dto);
+	    return ResponseEntity.status(HttpStatus.CREATED).body(object);
 	}
 }

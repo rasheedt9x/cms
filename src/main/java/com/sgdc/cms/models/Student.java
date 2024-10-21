@@ -1,5 +1,6 @@
 package com.sgdc.cms.models;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 import com.sgdc.cms.annotations.CustomStudentID;
@@ -49,7 +50,59 @@ public class Student extends User {
 	@Column(name = "nationality")
 	private String nationality;
 
-    public String getNationality() {
+	@Column(name = "primary_phone")
+    private String primaryPhone;
+
+    @Column(name = "secondary_phone")
+    private String secondaryPhone;
+
+	@Column(name = "guardian_name")
+    private String guardianName;
+
+	@Column(name = "guardian_phone")        
+    private String guardianPhone;
+
+	@Column(name = "ssc_school")
+    private String sscSchool;
+
+	@Column(name = "ssc_year_of_passing")
+    private String sscYearOfPassing;
+
+	@Column(name = "ssc_marks")
+    private String sscMarks;
+	@Column(name = "intermediate_college")
+    private String intermediateCollege;
+
+	@Column(name = "intermediate_year_of_passing")
+    private String intermediateYearOfPassing;
+
+    @Column(name = "intermediate_course")
+    private String intermediateMarks;
+
+    @Column(name = "degree_course")
+    private String degreeCourse;
+
+    @Column(name = "second_language")
+    private String secondLanguage;
+
+    @Column(name = "caste")
+    private String caste;
+
+    @Column(name = "religion")
+    private String religion;
+
+    @Column(name = "student_aadhaar")
+    private String studentAadhaar;
+  
+    @Column(name = "mother_aadhaar")
+    private String motherAadhaar;
+
+
+    public void setDateOfBirth(Date dateOfBirth) {
+		this.dateOfBirth = dateOfBirth;
+	}
+
+	public String getNationality() {
 		return nationality;
 	}
 
@@ -72,64 +125,10 @@ public class Student extends User {
 	public void setAddress(String address) {
 		this.address = address;
 	}
+
 	public Date getDateOfBirth() {
-		return dateOfBirth;
-	}
-
-	public void setDateOfBirth(Date dateOfBirth) {
-		this.dateOfBirth = dateOfBirth;
-	}
-
-	@Column(name = "primary_phone")
-    private String primaryPhone;
-
-    @Column(name = "secondary_phone")
-    private String secondaryPhone;
-
-    @Column(name = "guardian_name")
-    private String guardianName;
-
-    @Column(name = "guardian_phone")        
-    private String guardianPhone;
-
-    @Column(name = "ssc_school")
-    private String sscSchool;
-
-    @Column(name = "ssc_year_of_passing")
-    private String sscYearOfPassing;
-
-    @Column(name = "ssc_marks")
-    private String sscMarks;
-
-    
-
-    @Column(name = "intermediate_college")
-    private String intermediateCollege;
-
-
-    @Column(name = "intermediate_year_of_passing")
-    private String intermediateYearOfPassing;
-
-	@Column(name = "intermediate_course")
-    private String intermediateMarks;
-
-	@Column(name = "degree_course")
-    private String degreeCourse;
-
-	@Column(name = "second_language")
-    private String secondLanguage;
-
-	@Column(name = "caste")
-    private String caste;
-
-	@Column(name = "religion")
-    private String religion;
-
-	@Column(name = "student_aadhaar")
-    private String studentAadhaar;
-
-	@Column(name = "mother_aadhaar")
-    private String motherAadhaar;    
+		return this.dateOfBirth;
+	}    
 
 
 

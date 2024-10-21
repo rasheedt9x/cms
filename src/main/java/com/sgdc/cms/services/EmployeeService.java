@@ -16,6 +16,9 @@ import com.sgdc.cms.repositories.RoleRepository;
 import com.sgdc.cms.security.jwt.JwtTokenProvider;
 
 import jakarta.annotation.PostConstruct;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -58,14 +61,27 @@ public class EmployeeService {
 	    }
     }
 
-    public Employee saveEmployee(EmployeeDto dto) {
+    public EmployeeDto saveEmployee(EmployeeDto dto) {
         try {
             Employee e = new Employee();
             e.setName(dto.getName());
             e.setEmail(dto.getEmail());
             e.setUsername(dto.getUsername());
-            e.setPassword(passwordEncoder.encode("1234"));
+            e.setPassword(passwordEncoder.encode("SGDC@123"));
 
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+            LocalDate dob = LocalDate.parse(dto.getDateOfBirth(),dtf);
+            e.setDateOfBirth(dob);
+
+            
+            // LocalDate doj = LocalDate.parse(dto.(),dtf);
+            e.setDateOfJoining(LocalDate.now());
+            e.setDateOfLeaving(null);
+            e.setEmployed(true);
+            e.setGender(dto.getGender());
+            e.setNationality(dto.getNationality());
+            
             Role role = roleRepository.findByRoleName("EMPLOYEE");
             if (role != null) {
                 e.addRole(role);
@@ -83,7 +99,8 @@ public class EmployeeService {
                 throw new RuntimeException("Department not found");
             }
 
-            return employeeRepository.save(e);
+            e = employeeRepository.save(e);
+            return convertToDto(e);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Couldn't save employee", e);

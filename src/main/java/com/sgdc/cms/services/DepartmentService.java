@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import com.sgdc.cms.dto.DepartmentDto;
 import com.sgdc.cms.models.Department;
 import com.sgdc.cms.repositories.DepartmentRepository;
+
+import jakarta.annotation.PostConstruct;
 @Service
 public class DepartmentService{
 
@@ -14,6 +16,30 @@ public class DepartmentService{
     @Autowired
     public DepartmentService(DepartmentRepository dr){
         this.departmentRepository= dr;
+    }
+
+    
+    @PostConstruct
+    public void initDepts() {
+        String[] depts = new String[] { "MANAGEMENT", "Computer Science", "Mathematics", "Humanities"  };
+
+        for (String g : depts) {
+            try {
+                Department group = departmentRepository.findByDepartmentName(g);
+                if (group == null) {
+                    group = new Department();
+                    group.setDepartmentName(g);
+                    departmentRepository.save(group);
+                } else {
+                }
+
+            } catch (Exception e) {
+                // TODO: handle exception
+                e.printStackTrace();
+                throw new RuntimeException("Failed to save dep", e);
+            }
+        }
+
     }
     
     public String saveDepartment(DepartmentDto dto){

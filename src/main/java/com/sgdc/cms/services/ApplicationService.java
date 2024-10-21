@@ -1,6 +1,8 @@
 package com.sgdc.cms.services;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -241,6 +243,8 @@ public class ApplicationService {
         }
 
         dto.setGender(application.getGender());
+        
+      
         dto.setDateOfBirth(application.getDateOfBirth());
         dto.setNationality(application.getNationality());
         dto.setDegreeCourse(application.getDegreeCourse());

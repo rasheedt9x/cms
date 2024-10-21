@@ -1,5 +1,7 @@
 package com.sgdc.cms.services;
 
+import java.text.SimpleDateFormat;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,11 +61,15 @@ public class StudentService {
             Student s = new Student();
             s.setName(dto.getName());
             s.setEmail(dto.getEmail());
-            // s.setUsername(dto.getUsername());
-            s.setPassword(passwordEncoder.encode("SGDC@123"));
+            // s.setUsername(dto.getUsername());           s.setPassword(passwordEncoder.encode("SGDC@123"));
             s.setYearOfStudy(dto.getYearOfStudy());
             s.setCaste(dto.getCaste());
             s.setEnabled(true);
+
+            s.setPassword(passwordEncoder.encode("SGDC@123"));
+
+            SimpleDateFormat fmt = new SimpleDateFormat("dd/MM/yyyy");
+            s.setDateOfBirth(fmt.parse(dto.getDateOfBirth()));
 
             s.setSscSchool(dto.getSscSchool());
             s.setSscYearOfPassing(dto.getSscYearOfPassing());

@@ -40,6 +40,7 @@ print("r2", r2.status_code, r2.content)
     
     
 login_url = 'http://localhost:8080/auth/login'
+# Admission manager login to approve admission
 login_data = {
     'username': 'EM60000001',
     'password': '1234'
