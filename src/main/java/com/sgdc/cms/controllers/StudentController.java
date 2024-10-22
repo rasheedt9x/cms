@@ -2,6 +2,8 @@ package com.sgdc.cms.controllers;
 
 
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.Principal;
 
 import org.slf4j.Logger;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.sgdc.cms.dto.StudentDto;
 import com.sgdc.cms.models.Student;
 import com.sgdc.cms.services.StudentService;
+import com.sgdc.cms.utils.StorageUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -31,7 +34,12 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequestMapping(path = "/api/v1/students")
 public class StudentController {
 
+    private final Logger logger = LoggerFactory.getLogger(StudentController.class);
+
     private StudentService studentService;
+
+    
+    private StorageUtils storageUtils;
 
     @Autowired
     public StudentController(StudentService s){
@@ -40,6 +48,8 @@ public class StudentController {
 
     @GetMapping(path = "/ping")
     public ResponseEntity<String> ping(){
+        Path path = Paths.get(StorageUtils.UPLOAD_DIR);
+        logger.info(path.toAbsolutePath().toString());
         return ResponseEntity.ok("Pong");
     }
 

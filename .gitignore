@@ -1,3 +1,6 @@
+images/
+*.jpg
+*.png
 cms.db
 HELP.md
 target/

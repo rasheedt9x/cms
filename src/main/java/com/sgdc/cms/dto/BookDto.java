@@ -12,6 +12,7 @@ public class BookDto {
     private int availableCopies;
     private int totalCopies;
     private String imageBase64;
+    private String imagePath;
 
     
     public String getImageBase64() {
@@ -61,5 +62,13 @@ public class BookDto {
     public void setTotalCopies(int totalCopies) {
         this.totalCopies = totalCopies;
     }
+
+	public String getImagePath() {
+		return imagePath;
+	}
+
+	public void setImagePath(String imagePath) {
+		this.imagePath = imagePath;
+	}
 
 }

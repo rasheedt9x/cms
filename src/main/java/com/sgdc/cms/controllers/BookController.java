@@ -11,9 +11,8 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/book")
 public class BookController {
-
     private BookService bookService;
-
+    
     @Autowired
     public BookController(BookService bookService){
         this.bookService = bookService;
