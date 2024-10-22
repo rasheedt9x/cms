@@ -14,10 +14,19 @@ public class EmployeeDto {
     private String address;
     private String username;
     private String dateOfBirth;
+    private String dateOfApproval;
     private String dateOfJoining;
-    private String dateOfLeaving;
-    private boolean employed;
+	private String dateOfLeaving;
+	private boolean employed;
     private String employeeId;
+
+    
+    public String getDateOfApproval() {
+		return dateOfApproval;
+	}
+    public void setDateOfApproval(String dateOfApproval) {
+		this.dateOfApproval = dateOfApproval;
+	}
 
     
 	public String getEmployeeId() {

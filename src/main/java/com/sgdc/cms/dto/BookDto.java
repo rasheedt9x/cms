@@ -11,8 +11,18 @@ public class BookDto {
     private String isbn;
     private int availableCopies;
     private int totalCopies;
+    private String imageBase64;
 
-    public Long getId() {
+    
+    public String getImageBase64() {
+		return imageBase64;
+	}
+
+	public void setImageBase64(String imageBase64) {
+		this.imageBase64 = imageBase64;
+	}
+
+	public Long getId() {
         return id;
     }
 

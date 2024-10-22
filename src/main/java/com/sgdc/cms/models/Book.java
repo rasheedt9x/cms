@@ -25,6 +25,10 @@ public class Book {
     @Column(name = "total_copies")
     private int totalCopies;
 
+    // @Lob
+    // @Column(name = "image", columnDefinition = "BLOB")
+    // private byte[] image;
+
 
     public void setId(Long id) {
         this.id = id;
@@ -74,4 +78,12 @@ public class Book {
     public Long getId() {
         return id;
     }
+
+	// public byte[] getImage() {
+	// 	return image;
+	// }
+
+	// public void setImage(byte[] image) {
+	// 	this.image = image;
+	// }
 }

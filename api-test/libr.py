@@ -27,25 +27,37 @@ def library():
         "Content-Type": "application/json"
     }
 
+#    print(headers,stud_headers)
+
     dto = {
         "bookId" : 1,
     }
 
+    
+    ## REQUEST A BOOK BY ITS ID
     # r1 = requests.post(main_url + "bookloan/request",headers=stud_headers,json=dto)
     # print(r1.content)
 
+    ### GET ALL BOOKLOANS (LIBRARIAN ONLY)
     r1 = requests.get(main_url + "bookloan/all",headers=headers)
     print(r1.content)
-
+    
+    ### APPROVE A BOOK LOAN (LIBRARIAN) ONLY  
     # r1 = requests.post(main_url + "bookloan/approve/1",headers=headers)
     # print(r1.content)
 
+    ### REQUEST BOOK RETURN BY AN USER
     # r1 = requests.post(main_url + "bookloan/return/1",headers=stud_headers)
     # print(r1.content)
 
-    
+    ### APPROVE THE BOOK RETURN (LIBRARIAN ONLY)
     # r1 = requests.post(main_url + "bookloan/approveReturn/1",headers=headers)
     # print(r1.content)
+
+
+    ### GET ALL BOOK LOANS OF THE CURRENT USER
+    r1 = requests.get(main_url + "bookloan/self",headers=stud_headers)
+    print(r1.content)
 
     
     

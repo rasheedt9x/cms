@@ -44,6 +44,19 @@ public class LoanController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(loanDto);
     }
 
+
+    @GetMapping("/self")
+    public ResponseEntity<?> getSelfLoans(@RequestHeader("Authorization") String token) {
+        List<LoanDto> dtos = loanService.retriveAllLoansByUser(token.substring(7));
+        return ResponseEntity.ok().body(dtos);
+    }
+
+
+    @PostMapping("/renew/{id}")
+    public ResponseEntity<?> renewBookLoan(@PathVariable("id") Long id, @RequestHeader("Authorization") String token){
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/all")
     public ResponseEntity<?> getAllLoanApplications() {
         logger.info("Retrieving all loan applications");

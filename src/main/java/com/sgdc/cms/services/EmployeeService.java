@@ -76,7 +76,8 @@ public class EmployeeService {
 
             
             // LocalDate doj = LocalDate.parse(dto.(),dtf);
-            e.setDateOfJoining(LocalDate.now());
+            e.setDateOfApproval(LocalDate.now());
+            e.setDateOfJoining(LocalDate.now().plusDays(7));
             e.setDateOfLeaving(null);
             e.setEmployed(true);
             e.setGender(dto.getGender());
@@ -165,7 +166,7 @@ public class EmployeeService {
 
     public EmployeeDto convertToDto(Employee employee) {
         EmployeeDto employeeDto = new EmployeeDto();
-       employeeDto.setName(employee.getName());                     
+        employeeDto.setName(employee.getName());                     
         employeeDto.setEmail(employee.getEmail());                   
         employeeDto.setUsername(employee.getUsername());             
         employeeDto.setDepartmentName(employee.getDepartment() != null ? employee.getDepartment().getDepartmentName() : null);
@@ -176,8 +177,10 @@ public class EmployeeService {
         employeeDto.setDateOfBirth(employee.getDateOfBirth() != null? employee.getDateOfBirth().toString(): null);      
         
         
+        employeeDto.setDateOfApproval(employee.getDateOfApproval() != null? employee.getDateOfApproval().toString(): null);   
         employeeDto.setDateOfJoining(employee.getDateOfJoining() != null? employee.getDateOfJoining().toString(): null);   
         employeeDto.setDateOfLeaving(employee.getDateOfLeaving() != null? employee.getDateOfLeaving().toString(): null);   
+        employeeDto.setEmployed(employee.isEmployed());
 
         employeeDto.setEmployeeId(employee.getEmployeeId());         
         return employeeDto;

@@ -60,7 +60,7 @@ public class Loan {
         this.book = book;
     }
 
-    public User getUsername() {
+    public User getUser() {
         return user;
     }
 
@@ -93,6 +93,6 @@ public class Loan {
     }
 
     public boolean isOverdue() {
-        return (loanStatus == LoanStatus.APPROVED) && (dueDate != null && dueDate.isAfter(LocalDate.now()));
+        return (loanStatus == LoanStatus.APPROVED) && (dueDate != null && LocalDate.now().isAfter(dueDate));
     }
 }

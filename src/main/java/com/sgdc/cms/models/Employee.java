@@ -26,6 +26,9 @@ public class Employee extends User{
 	@Column(name = "date_of_joining")
 	private LocalDate dateOfJoining;
 
+	@Column(name = "date_of_approval")
+	private LocalDate dateOfApproval;
+	
 	@Column(name = "date_of_leaving")
 	private LocalDate dateOfLeaving;
 
@@ -44,6 +47,14 @@ public class Employee extends User{
 
 	@Column(name = "address")
     private String address;
+
+	public LocalDate getDateOfApproval() {
+		return dateOfApproval;
+	}
+
+	public void setDateOfApproval(LocalDate dateOfApproval) {
+		this.dateOfApproval = dateOfApproval;
+	}
 
     public LocalDate getDateOfBirth() {
 		return dateOfBirth;

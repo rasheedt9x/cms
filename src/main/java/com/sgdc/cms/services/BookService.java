@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,6 +34,11 @@ public class BookService {
                     bookDto.setIsbn(book.getIsbn());
                     bookDto.setAvailableCopies(book.getAvailableCopies());
                     bookDto.setTotalCopies(book.getTotalCopies());
+
+                    // if (book.getImage() != null) {
+                    // 	String b64 = Base64.getEncoder().encodeToString(book.getImage());
+                    //     bookDto.setImageBase64(b64);
+                    // }
                     return bookDto;
                 })
                 .collect(Collectors.toList());
@@ -51,6 +57,20 @@ public class BookService {
         book.setIsbn(bookDto.getIsbn());
         book.setAvailableCopies(bookDto.getAvailableCopies());
         book.setTotalCopies(bookDto.getTotalCopies());
+
+        // try {
+        //     if (bookDto.getImageBase64() != null) {
+        //         byte[] image = Base64.getDecoder().decode(bookDto.getImageBase64());
+        //     	book.setImage(image);
+        //     } else {
+        //         book.setImage(null);
+        //     }
+            
+        // } catch (Exception e ) {
+        //     e.printStackTrace();
+        // }
+
+        
         try {
             book = bookRepository.save(book);
         } catch (Exception e) {

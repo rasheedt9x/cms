@@ -7,6 +7,7 @@ import com.sgdc.cms.models.Employee;
 import com.sgdc.cms.models.Loan;
 import com.sgdc.cms.models.LoanStatus;
 import com.sgdc.cms.models.Role;
+import com.sgdc.cms.models.User;
 import com.sgdc.cms.repositories.BookRepository;
 import com.sgdc.cms.repositories.EmployeeRepository;
 import com.sgdc.cms.repositories.LoanRepository;
@@ -15,9 +16,12 @@ import com.sgdc.cms.security.jwt.JwtTokenProvider;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.hibernate.boot.model.process.internal.UserTypeResolution;
+import org.hibernate.metamodel.internal.EmbeddableInstantiatorPojoStandard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,11 +112,7 @@ public class LoanService {
         List<Loan> loans = loanRepository.findAll();
         return loans.stream()
                 .map(loan -> {
-                    // LoanDto dto = new LoanDto();
-                    // dto.setId(loan.getId());
-                    // dto.setBook(loan.getBook().getId());
-                    // dto.setBookTitle(loan.getBook().getTitle());
-                    return createLoanDtoFromLoan(loan);
+                return createLoanDtoFromLoan(loan);
                 }).collect(Collectors.toList());
     }
 
@@ -134,7 +134,7 @@ public class LoanService {
         return createLoanDtoFromLoan(loan);
     }
 
-    public LoanDto createLoanDtoFromLoan(Loan loan) {
+    public LoanDto createLoanDtoFromLoan(Loan loan) {        
         LoanDto loanDto = new LoanDto();
         loanDto.setId(loan.getId());
         loanDto.setBook(loan.getBook().getId());
@@ -144,6 +144,15 @@ public class LoanService {
         loanDto.setReturnDate(loan.getReturnDate() != null ? loan.getReturnDate().toString() : null);
         loanDto.setLoanStatus(loan.getLoanStatus().toString());
 
+        String collegeId = null;
+        String username = loan.getUser().getUsername();
+        if (studentRepository.existsByUsername(username) ){
+            collegeId = studentRepository.findByUsername(username).get().getStudentId();
+        } else if (employeeRepository.existsByUsername(username)) {
+        	collegeId = employeeRepository.findByUsername(username).get().getEmployeeId();
+        } else {
+            throw new RuntimeException("Creating loan dto -> Unable to process");
+        }
         return loanDto;
     }
 
@@ -188,7 +197,29 @@ public class LoanService {
         loanRepository.save(loan);
     }
 
-    @Scheduled(cron = "0 0 0 * * ?")
+
+    public List<LoanDto> retriveAllLoansByUser(String token) {
+        String username = jwtTokenProvider.getUsernameFromToken(token);
+        User user = null;
+        if (studentRepository.existsByUsername(username)) {
+            user = studentRepository.findByUsername(username).get();
+        } else if (employeeRepository.existsByUsername(username)) {
+        	user = employeeRepository.findByUsername(username).get();
+        }
+        List<Loan> allLoans = loanRepository.findAllByUser(user);
+        List<LoanDto> dtos = new ArrayList<>();
+
+        for(Loan loan: allLoans) {
+            dtos.add(createLoanDtoFromLoan(loan));
+        }
+        return dtos;
+    }
+
+
+    
+
+//    @Scheduled(cron = "0 0 0 * * ?")
+    @Scheduled(fixedDelay = 1000*60)
     public void overdueLoans() {
         checkForOverdueLoans();
     }
