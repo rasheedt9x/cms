@@ -60,5 +60,8 @@ def library():
     print(r1.content)
 
     
+    r1 = requests.post(main_url + "bookloan/renew/1",headers=stud_headers)
+    print(r1.content)
+    
     
 library()

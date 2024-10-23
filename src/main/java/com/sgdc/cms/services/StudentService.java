@@ -9,7 +9,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.sgdc.cms.dto.StudentDto;
-//import com.sgdc.cms.models.Group;
 import com.sgdc.cms.models.Role;
 import com.sgdc.cms.models.Student;
 import com.sgdc.cms.models.StudentGroup;
@@ -115,9 +114,7 @@ public class StudentService {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
-    }
-
-    
+    }   
 
     public JwtTokenProvider getJwtTokenProvider() {
         return jwtTokenProvider;

@@ -36,9 +36,7 @@ public class StudentController {
 
     private final Logger logger = LoggerFactory.getLogger(StudentController.class);
 
-    private StudentService studentService;
-
-    
+    private StudentService studentService;  
     private StorageUtils storageUtils;
 
     @Autowired

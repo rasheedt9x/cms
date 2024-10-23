@@ -51,12 +51,6 @@ public class LoanController {
         return ResponseEntity.ok().body(dtos);
     }
 
-
-    @PostMapping("/renew/{id}")
-    public ResponseEntity<?> renewBookLoan(@PathVariable("id") Long id, @RequestHeader("Authorization") String token){
-        return ResponseEntity.ok().build();
-    }
-
     @GetMapping("/all")
     public ResponseEntity<?> getAllLoanApplications() {
         logger.info("Retrieving all loan applications");
@@ -117,6 +111,19 @@ public class LoanController {
             logger.error("Error approving return for loan ID: {}", loanId, e);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to approve return");
         }
+    }
+
+
+    @PostMapping("/renew/{id}")
+    public ResponseEntity<?> applyRenewal(@PathVariable("id") Long id, @RequestHeader("Authorization") String token) {
+    
+        if (!loanService.isLibrarian(token.substring(7))) {
+            logger.error("Could not approve renewal -> Employee is not a librarian or token is missing");
+            throw new RuntimeException("Could not approve renewal -> Employee is not a librarian");
+        }
+ 
+        LoanDto loanDto = loanService.renewLoan(id);
+        return ResponseEntity.status(HttpStatus.OK).body(loanDto);
     }
 }
 
