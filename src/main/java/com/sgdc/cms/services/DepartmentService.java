@@ -10,7 +10,6 @@ import com.sgdc.cms.repositories.DepartmentRepository;
 import jakarta.annotation.PostConstruct;
 @Service
 public class DepartmentService{
-
     DepartmentRepository departmentRepository;
 
     @Autowired
@@ -21,7 +20,7 @@ public class DepartmentService{
     
     @PostConstruct
     public void initDepts() {
-        String[] depts = new String[] { "MANAGEMENT", "Computer Science", "Mathematics", "Humanities"  };
+        String[] depts = new String[] { "MANAGEMENT", "Computer Science", "Sciences", "Humanities","Commerce"};
 
         for (String g : depts) {
             try {
@@ -34,7 +33,6 @@ public class DepartmentService{
                 }
 
             } catch (Exception e) {
-                // TODO: handle exception
                 e.printStackTrace();
                 throw new RuntimeException("Failed to save dep", e);
             }

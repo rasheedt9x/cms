@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.sgdc.cms.dto.StudentDto;
+import com.sgdc.cms.dto.UpdateUserDto;
 import com.sgdc.cms.models.Role;
 import com.sgdc.cms.models.Student;
 import com.sgdc.cms.models.StudentGroup;
@@ -115,6 +116,56 @@ public class StudentService {
             throw new RuntimeException(e);
         }
     }   
+
+
+
+
+    public boolean changePasswordOrEmail(UpdateUserDto dto, String token) {
+        String username = jwtTokenProvider.getUsernameFromToken(token);
+        Student e = studentRepository.findByUsername(username).orElseThrow(
+                () -> new RuntimeException("Failed to update"));
+
+        // pass change
+        if (dto.getOldPassword() != null && dto.getNewPassword() != null) {
+            if (!passwordEncoder.matches(dto.getOldPassword(), e.getPassword())) {
+                throw new RuntimeException("Old password doesnt match");
+            }
+
+            // if (!dto.getNewPassword().equals(dto.getConfirmPassword())) {
+            //     throw new RuntimeException("Passwords do not match");
+            // }
+
+            e.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+
+            
+            try {
+                studentRepository.save(e);
+            } catch (Exception ex) {
+                throw new RuntimeException("Failed to update pwd in db");
+            }
+        }
+
+        // mail change (if provided)
+        if (dto.getEmail() != null) {
+            if (dto.getOldPassword() != null && passwordEncoder.matches(dto.getOldPassword(), e.getPassword())) {
+                e.setEmail(dto.getEmail());
+
+                try {
+                    studentRepository.save(e);
+                } catch (Exception ex) {
+                    throw new RuntimeException("Failed to update pwd in db");
+                }
+                
+            } else {
+                throw new RuntimeException("Error while updating email -> password doesnt match");
+            }
+        }
+
+        return true;
+
+    }
+
+    
 
     public JwtTokenProvider getJwtTokenProvider() {
         return jwtTokenProvider;

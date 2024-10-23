@@ -7,6 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.sgdc.cms.dto.EmployeeDto;
+import com.sgdc.cms.dto.UpdateUserDto;
 import com.sgdc.cms.models.Department;
 import com.sgdc.cms.models.Employee;
 import com.sgdc.cms.models.Role;
@@ -34,31 +35,33 @@ public class EmployeeService {
 
     @Autowired
     public EmployeeService(EmployeeRepository empRepo, PasswordEncoder pwe, RoleRepository roleRepo,
-                           DepartmentRepository dRepo) {
+            DepartmentRepository dRepo) {
         this.employeeRepository = empRepo;
         this.passwordEncoder = pwe;
         this.roleRepository = roleRepo;
         this.departmentRepository = dRepo;
     }
 
-	public JwtTokenProvider getJwtTokenProvider() {
-		return jwtTokenProvider;
-	}
+    public JwtTokenProvider getJwtTokenProvider() {
+        return jwtTokenProvider;
+    }
 
     @Autowired
-	public void setJwtTokenProvider(JwtTokenProvider jwtTokenProvider) {
-		this.jwtTokenProvider = jwtTokenProvider;
-	}
+    public void setJwtTokenProvider(JwtTokenProvider jwtTokenProvider) {
+        this.jwtTokenProvider = jwtTokenProvider;
+    }
 
     @PostConstruct
     public void initAdmins() {
         try {
-            createAdminIfNotExists("adm_admin", "ADMISSION_ADMIN", "adm_admin@example.com", new String[]{"ADMISSION_MANAGER","EMPLOYEE"});
-            createAdminIfNotExists("admin", "ADMIN", "admin@example.com", new String[]{"ADMIN","EMPLOYEE"});
-    	    createAdminIfNotExists("libr123","LIBRARIAN","librarian@example.com",new String[]{"LIBRARIAN","EMPLOYEE"});
+            createAdminIfNotExists("adm_admin", "ADMISSION_ADMIN", "adm_admin@example.com",
+                    new String[] { "ADMISSION_MANAGER", "EMPLOYEE" });
+            createAdminIfNotExists("admin", "ADMIN", "admin@example.com", new String[] { "ADMIN", "EMPLOYEE" });
+            createAdminIfNotExists("libr123", "LIBRARIAN", "librarian@example.com",
+                    new String[] { "LIBRARIAN", "EMPLOYEE" });
         } catch (Exception ex) {
             logger.error("Error during PostConstruct initialization: ", ex);
-	    }
+        }
     }
 
     public EmployeeDto saveEmployee(EmployeeDto dto) {
@@ -71,10 +74,9 @@ public class EmployeeService {
 
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-            LocalDate dob = LocalDate.parse(dto.getDateOfBirth(),dtf);
+            LocalDate dob = LocalDate.parse(dto.getDateOfBirth(), dtf);
             e.setDateOfBirth(dob);
 
-            
             // LocalDate doj = LocalDate.parse(dto.(),dtf);
             e.setDateOfApproval(LocalDate.now());
             e.setDateOfJoining(LocalDate.now().plusDays(7));
@@ -82,7 +84,7 @@ public class EmployeeService {
             e.setEmployed(true);
             e.setGender(dto.getGender());
             e.setNationality(dto.getNationality());
-            
+
             Role role = roleRepository.findByRoleName("EMPLOYEE");
             if (role != null) {
                 e.addRole(role);
@@ -108,12 +110,10 @@ public class EmployeeService {
         }
     }
 
-
     public EmployeeDto retrieveEmployeeByToken(String token) {
         String username = jwtTokenProvider.getUsernameFromToken(token);
         Employee e = employeeRepository.findByUsername(username).orElseThrow(
-            () -> new RuntimeException("Couldnt find employee with provided auth")
-        );
+                () -> new RuntimeException("Couldnt find employee with provided auth"));
         return convertToDto(e);
     }
 
@@ -147,7 +147,7 @@ public class EmployeeService {
             roles.add(role);
         }
 
-        for(Role r : roles) {
+        for (Role r : roles) {
             r.setRolename(r.getRolename());
             employee.addRole(r);
         }
@@ -166,25 +166,70 @@ public class EmployeeService {
 
     public EmployeeDto convertToDto(Employee employee) {
         EmployeeDto employeeDto = new EmployeeDto();
-        employeeDto.setName(employee.getName());                     
-        employeeDto.setEmail(employee.getEmail());                   
-        employeeDto.setUsername(employee.getUsername());             
-        employeeDto.setDepartmentName(employee.getDepartment() != null ? employee.getDepartment().getDepartmentName() : null);
-        
-        employeeDto.setNationality(employee.getNationality());       
-        employeeDto.setGender(employee.getGender());                 
-        employeeDto.setAddress(employee.getAddress());               
-        employeeDto.setDateOfBirth(employee.getDateOfBirth() != null? employee.getDateOfBirth().toString(): null);      
-        
-        
-        employeeDto.setDateOfApproval(employee.getDateOfApproval() != null? employee.getDateOfApproval().toString(): null);   
-        employeeDto.setDateOfJoining(employee.getDateOfJoining() != null? employee.getDateOfJoining().toString(): null);   
-        employeeDto.setDateOfLeaving(employee.getDateOfLeaving() != null? employee.getDateOfLeaving().toString(): null);   
+        employeeDto.setName(employee.getName());
+        employeeDto.setEmail(employee.getEmail());
+        employeeDto.setUsername(employee.getUsername());
+        employeeDto.setDepartmentName(
+                employee.getDepartment() != null ? employee.getDepartment().getDepartmentName() : null);
+
+        employeeDto.setNationality(employee.getNationality());
+        employeeDto.setGender(employee.getGender());
+        employeeDto.setAddress(employee.getAddress());
+        employeeDto.setDateOfBirth(employee.getDateOfBirth() != null ? employee.getDateOfBirth().toString() : null);
+
+        employeeDto.setDateOfApproval(
+                employee.getDateOfApproval() != null ? employee.getDateOfApproval().toString() : null);
+        employeeDto
+                .setDateOfJoining(employee.getDateOfJoining() != null ? employee.getDateOfJoining().toString() : null);
+        employeeDto
+                .setDateOfLeaving(employee.getDateOfLeaving() != null ? employee.getDateOfLeaving().toString() : null);
         employeeDto.setEmployed(employee.isEmployed());
 
-        employeeDto.setEmployeeId(employee.getEmployeeId());         
+        employeeDto.setEmployeeId(employee.getEmployeeId());
         return employeeDto;
     }
 
-}
+    public boolean changePasswordOrEmail(UpdateUserDto dto, String token) {
+        String username = jwtTokenProvider.getUsernameFromToken(token);
+        Employee e = employeeRepository.findByUsername(username).orElseThrow(
+                () -> new RuntimeException("Failed to update"));
 
+        // pass change
+        if (dto.getOldPassword() != null && dto.getNewPassword() != null) {
+            if (!passwordEncoder.matches(dto.getOldPassword(), e.getPassword())) {
+                throw new RuntimeException("Old password doesnt match");
+            }
+
+            // if (!dto.getNewPassword().equals(dto.getConfirmPassword())) {
+            //     throw new RuntimeException("Passwords do not match");
+            // }
+
+            e.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+
+            try {
+                employeeRepository.save(e);
+            } catch (Exception ex) {
+                throw new RuntimeException("Failed to update pwd in db");
+            }
+        }
+
+        // mail change (if provided)
+        if (dto.getEmail() != null) {
+            if (dto.getOldPassword() != null && passwordEncoder.matches(dto.getOldPassword(), e.getPassword())) {
+                e.setEmail(dto.getEmail());
+
+                try {
+                    employeeRepository.save(e);
+                } catch (Exception ex) {
+                    throw new RuntimeException("Failed to update pwd in db");
+                }
+
+            } else {
+                throw new RuntimeException("Error while updating email -> password doesnt match");
+            }
+        }
+
+        return true;
+    }
+
+}
