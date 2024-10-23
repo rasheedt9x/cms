@@ -201,7 +201,7 @@ public class EmployeeService {
             }
 
             // if (!dto.getNewPassword().equals(dto.getConfirmPassword())) {
-            //     throw new RuntimeException("Passwords do not match");
+            // throw new RuntimeException("Passwords do not match");
             // }
 
             e.setPassword(passwordEncoder.encode(dto.getNewPassword()));

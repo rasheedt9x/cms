@@ -10,9 +10,11 @@ import org.springframework.stereotype.Service;
 
 import com.sgdc.cms.dto.StudentDto;
 import com.sgdc.cms.dto.UpdateUserDto;
+import com.sgdc.cms.models.Department;
 import com.sgdc.cms.models.Role;
 import com.sgdc.cms.models.Student;
 import com.sgdc.cms.models.StudentGroup;
+import com.sgdc.cms.repositories.DepartmentRepository;
 import com.sgdc.cms.repositories.RoleRepository;
 import com.sgdc.cms.repositories.StudentGroupRepository;
 import com.sgdc.cms.repositories.StudentRepository;
@@ -27,23 +29,24 @@ public class StudentService {
     private PasswordEncoder passwordEncoder;
     private RoleRepository roleRepository;
     private StudentGroupRepository studentGroupRepo;
+    private DepartmentRepository departmentRepository;
 
     private JwtTokenProvider jwtTokenProvider;
 
     @Autowired
     public StudentService(StudentRepository repo, PasswordEncoder pwe, RoleRepository roleRepo,
-            StudentGroupRepository sgr) {
+            StudentGroupRepository sgr, DepartmentRepository deptRepo) {
         this.studentRepository = repo;
         this.passwordEncoder = pwe;
         this.roleRepository = roleRepo;
         this.studentGroupRepo = sgr;
+        this.departmentRepository = deptRepo;
     }
-    
+
     public Student findStudentByToken(String token) {
         String username = this.jwtTokenProvider.getUsernameFromToken(token);
         Student s = studentRepository.findByUsername(username).orElseThrow(
-            () -> new RuntimeException("Student not found")
-        );
+                () -> new RuntimeException("Student not found"));
         return s;
     }
 
@@ -61,7 +64,8 @@ public class StudentService {
             Student s = new Student();
             s.setName(dto.getName());
             s.setEmail(dto.getEmail());
-            // s.setUsername(dto.getUsername());           s.setPassword(passwordEncoder.encode("SGDC@123"));
+            // s.setUsername(dto.getUsername());
+            // s.setPassword(passwordEncoder.encode("SGDC@123"));
             s.setYearOfStudy(dto.getYearOfStudy());
             s.setCaste(dto.getCaste());
             s.setEnabled(true);
@@ -104,6 +108,24 @@ public class StudentService {
                 s.addRole(tRole);
             }
 
+            String depName = null;
+            if (dto.getDegreeCourse().equals("BCA") || dto.getDegreeCourse().equals("BSC")) {
+                depName = "Computer Science";
+            } else if (dto.getDegreeCourse().equals("BCOM") || dto.getDegreeCourse().equals("BBA")) {
+                depName = "Commerce";
+            } else if (dto.getDegreeCourse().equals("BIOTECH") || dto.getDegreeCourse().equals("BZC")) {
+                depName = "Sciences";
+            } else {
+                throw new RuntimeException("Error saving student -> department not found with name " + depName);
+            }
+
+            Department dept = departmentRepository.findByDepartmentName(depName);
+            if (dept == null) {
+                throw new RuntimeException("Error saving student -> department search -> not found with name " + depName);
+            } else {
+                s.setDepartment(dept);
+            }
+
             if (studentRepository.existsByUsername(dto.getUsername())) {
                 throw new RuntimeException("Username exists");
             } else {
@@ -115,10 +137,7 @@ public class StudentService {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
-    }   
-
-
-
+    }
 
     public boolean changePasswordOrEmail(UpdateUserDto dto, String token) {
         String username = jwtTokenProvider.getUsernameFromToken(token);
@@ -132,12 +151,11 @@ public class StudentService {
             }
 
             // if (!dto.getNewPassword().equals(dto.getConfirmPassword())) {
-            //     throw new RuntimeException("Passwords do not match");
+            // throw new RuntimeException("Passwords do not match");
             // }
 
             e.setPassword(passwordEncoder.encode(dto.getNewPassword()));
 
-            
             try {
                 studentRepository.save(e);
             } catch (Exception ex) {
@@ -155,7 +173,7 @@ public class StudentService {
                 } catch (Exception ex) {
                     throw new RuntimeException("Failed to update pwd in db");
                 }
-                
+
             } else {
                 throw new RuntimeException("Error while updating email -> password doesnt match");
             }
@@ -164,8 +182,6 @@ public class StudentService {
         return true;
 
     }
-
-    
 
     public JwtTokenProvider getJwtTokenProvider() {
         return jwtTokenProvider;

@@ -6,8 +6,8 @@ main_url = "http://localhost:8080/api/v1/"
 
 jwt_token = None
 
-def stud():
-    login_data = {"username": "ST70000001", "password": "SGDC@123"}
+def stud(username):
+    login_data = {"username": username, "password": "SGDC@123"}
     response = requests.post(login_url, json=login_data)
     print(response.json())
     jwt_token = response.json().get('token')
@@ -23,10 +23,12 @@ def stud():
     print(r1.content)
 
     
-    # r1 = requests.get(main_url + "students/get/self", headers=headers)
-    # print(r1.content)
+    r1 = requests.get(main_url + "students/get/self", headers=headers)
+    print(r1.content)
 
     # r2 = requests.post(logout_url,headers=headers)
     # print(r2.content)
     
-stud()
+stud("ST70000001")
+stud("ST70000002")
+stud("ST70000003")

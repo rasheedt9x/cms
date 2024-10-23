@@ -20,9 +20,11 @@ import com.sgdc.cms.dto.ApplicationDto;
 import com.sgdc.cms.exceptions.ApplicationSaveException;
 import com.sgdc.cms.models.Application;
 import com.sgdc.cms.models.ApplicationStatus;
+import com.sgdc.cms.models.Department;
 import com.sgdc.cms.models.Role;
 import com.sgdc.cms.models.Student;
 import com.sgdc.cms.repositories.ApplicationRepository;
+import com.sgdc.cms.repositories.DepartmentRepository;
 import com.sgdc.cms.repositories.RoleRepository;
 import com.sgdc.cms.repositories.StudentRepository;
 
@@ -40,14 +42,17 @@ public class ApplicationService {
 
     private RoleRepository roleRepository;
 
+    private DepartmentRepository departmentRepository;
+
     @Autowired
     public ApplicationService(ApplicationRepository repository, StudentRepository studentRepo,
-            StudentGroupRepository sgr, PasswordEncoder pwe, RoleRepository roleRepository) {
+            StudentGroupRepository sgr, PasswordEncoder pwe, RoleRepository roleRepository, DepartmentRepository deptRepo) {
         this.repository = repository;
         this.studentRepository = studentRepo;
         this.studentGroupRepository = sgr;
         this.passwordEncoder = pwe;
         this.roleRepository = roleRepository;
+        this.departmentRepository = deptRepo;
     }
 
     public String[] saveApplication(ApplicationDto dto) {
@@ -242,6 +247,24 @@ public class ApplicationService {
             logger.info("Group found: " + group.getGroupname());
         }
 
+        String depName = null;
+        if (application.getDegreeCourse().equals("BCA") || application.getDegreeCourse().equals("BSC"))  {
+        	depName = "Computer Science";
+        } else if (  application.getDegreeCourse().equals("BCOM") || application.getDegreeCourse().equals("BBA") ) {
+        	depName = "Commerce";
+        } else if (    application.getDegreeCourse().equals("BIOTECH") || application.getDegreeCourse().equals("BZC")   ) {
+        	depName = "Sciences";
+        } else {
+            throw new RuntimeException("Error approving student -> department not found");
+        }
+
+        Department dept = departmentRepository.findByDepartmentName(depName);
+        if (dept == null) {
+        	throw new RuntimeException("Error approving student -> department search -> not found");
+        } else {
+            dto.setDepartment(dept);
+        }
+
         dto.setGender(application.getGender());
         
       
@@ -278,6 +301,9 @@ public class ApplicationService {
             roleRepository.save(tRole);
             dto.addRole(tRole);
         }
+
+        
+        
         try {
             studentRepository.save(dto);
             logger.info("Student saved with ID: " + dto.getStudentId());

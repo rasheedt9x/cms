@@ -18,7 +18,7 @@ import jakarta.persistence.TemporalType;
 @Table(name = "students")
 public class Student extends User {   
 
-        // @GeneratedValue(generator = "stu_id_gen")
+    // @GeneratedValue(generator = "stu_id_gen")
     // @GenericGenerator(name = "stu_id_gen",type = StudentIDGenerator.class)
     // @GeneratorType(type = StudentIDGenerator.class,when = GenerationTime.INSERT)
 
@@ -70,6 +70,7 @@ public class Student extends User {
 
 	@Column(name = "ssc_marks")
     private String sscMarks;
+
 	@Column(name = "intermediate_college")
     private String intermediateCollege;
 
@@ -98,7 +99,20 @@ public class Student extends User {
     private String motherAadhaar;
 
 
-    public void setDateOfBirth(Date dateOfBirth) {
+	@ManyToOne
+    @JoinColumn(name = "dept_id")    
+    private Department department;
+
+
+    public Department getDepartment() {
+		return department;
+	}
+
+	public void setDepartment(Department department) {
+		this.department = department;
+	}
+
+	public void setDateOfBirth(Date dateOfBirth) {
 		this.dateOfBirth = dateOfBirth;
 	}
 
