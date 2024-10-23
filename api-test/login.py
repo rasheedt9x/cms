@@ -8,11 +8,11 @@ jwt_token = None
 
 def admin():
 ## emp login    
-#    login_data = {"username": "EM60000001", "password": "12345"}
+#    login_data = {"username": "EM60000004", "password": "SGDC@123"}
 
    
     ## student login
-    login_data = {"username": "ST70000001", "password": "SGDC@123"}
+    login_data = {"username": "ST70000004", "password": "SGDC@123"}
     response = requests.post(login_url, json=login_data)
     print(response.json())
     jwt_token = response.json().get('token')
@@ -112,6 +112,18 @@ def admin():
     # print(r1.content, r1.status_code)
 
 
+
+    # To be called by employee (Fetch all students in the department)
+    # r1 = requests.get(main_url + "employees/get/self/dept/students", headers=headers)
+    # print(r1.content)
+
+
+
+
+    
+    # # To be called by student only (Fetch all teachers in the Student department)
+    # r1 = requests.get(main_url + "students/get/self/dept/teachers", headers=headers)
+    # print(r1.content)
 
 
 

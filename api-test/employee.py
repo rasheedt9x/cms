@@ -70,7 +70,20 @@ if response.status_code == 200:
             "name": "Bob Brown",
             "username": "bobbrown",
             "email": "bobbrown@example.com",
-            "departmentName": "Mathematics",  # Valid department
+            "departmentName": "Sciences",  # Valid department
+            "nationality": "Australian",
+            "gender": "Male",
+            "address": "321 Pine St, Yourtown, AU",
+            "dateOfBirth": "30/07/1988",
+            "dateOfJoining": "30/07/2022",
+            "dateOfLeaving": None,
+            "employed": True
+        },
+        {
+            "name": "Millie",
+            "username": "Milrown",
+            "email": "Milwn@example.com",
+            "departmentName": "Computer Science",  # Valid department
             "nationality": "Australian",
             "gender": "Male",
             "address": "321 Pine St, Yourtown, AU",

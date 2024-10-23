@@ -5,6 +5,7 @@ package com.sgdc.cms.controllers;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Principal;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.sgdc.cms.dto.StudentDto;
 import com.sgdc.cms.dto.UpdateUserDto;
+import com.sgdc.cms.models.Employee;
 import com.sgdc.cms.models.Student;
 import com.sgdc.cms.services.StudentService;
 import com.sgdc.cms.utils.StorageUtils;
@@ -68,15 +70,23 @@ public class StudentController {
         return ResponseEntity.ok().build();
     }
 
+    
+    @GetMapping("/get/self/dept/teachers")
+    public ResponseEntity<?> getAllStudentsInDept(Principal principal,HttpServletRequest request) {
+        String auth = request.getHeader("Authorization");
+        String token = auth.substring(7);
+        List<Employee> l = studentService.retrieveTeachersByDepartment(token);
+        return ResponseEntity.ok().body(l);
+    }
+
     @PostMapping("/new")
     public ResponseEntity<?> addStudent(@RequestBody StudentDto dto){
         Object obj = studentService.saveStudent(dto);
         return ResponseEntity.ok(obj.toString());
     }
 
-
-
-    
+  
+   
 	@PostMapping("/get/updateProfile")
 	public ResponseEntity<?> changePassOrEmail (@RequestBody UpdateUserDto dto,@RequestHeader("Authorization") String token) {
         boolean updated = studentService.changePasswordOrEmail(dto, token.substring(7));

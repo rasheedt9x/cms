@@ -1,6 +1,7 @@
 package com.sgdc.cms.services;
 
 import java.text.SimpleDateFormat;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,10 +12,12 @@ import org.springframework.stereotype.Service;
 import com.sgdc.cms.dto.StudentDto;
 import com.sgdc.cms.dto.UpdateUserDto;
 import com.sgdc.cms.models.Department;
+import com.sgdc.cms.models.Employee;
 import com.sgdc.cms.models.Role;
 import com.sgdc.cms.models.Student;
 import com.sgdc.cms.models.StudentGroup;
 import com.sgdc.cms.repositories.DepartmentRepository;
+import com.sgdc.cms.repositories.EmployeeRepository;
 import com.sgdc.cms.repositories.RoleRepository;
 import com.sgdc.cms.repositories.StudentGroupRepository;
 import com.sgdc.cms.repositories.StudentRepository;
@@ -30,10 +33,10 @@ public class StudentService {
     private RoleRepository roleRepository;
     private StudentGroupRepository studentGroupRepo;
     private DepartmentRepository departmentRepository;
-
+    private EmployeeRepository employeeRepository;
     private JwtTokenProvider jwtTokenProvider;
 
-    @Autowired
+	@Autowired
     public StudentService(StudentRepository repo, PasswordEncoder pwe, RoleRepository roleRepo,
             StudentGroupRepository sgr, DepartmentRepository deptRepo) {
         this.studentRepository = repo;
@@ -42,6 +45,15 @@ public class StudentService {
         this.studentGroupRepo = sgr;
         this.departmentRepository = deptRepo;
     }
+
+	public EmployeeRepository getEmployeeRepository() {
+		return employeeRepository;
+	}
+
+    @Autowired
+    public void setEmployeeRepository(EmployeeRepository employeeRepository) {
+		this.employeeRepository = employeeRepository;
+	}
 
     public Student findStudentByToken(String token) {
         String username = this.jwtTokenProvider.getUsernameFromToken(token);
@@ -181,6 +193,20 @@ public class StudentService {
 
         return true;
 
+    }
+
+
+    public List<Employee> retrieveTeachersByDepartment(String token) {
+        String username = jwtTokenProvider.getUsernameFromToken(token);
+        Student s = studentRepository.findByUsername(username).orElseThrow(
+            () -> new RuntimeException("Retrieving teachers in student dept -> couldnt find student")
+        );
+        logger.info(s.getName() + " " + "fetching teachers");
+        Department d = s.getDepartment();
+        logger.info(s.getDepartment().getDepartmentName() + " " + "teachers");
+        List<Employee> l = employeeRepository.findAllByDepartment(d);
+        logger.info("Length of l: {}",l.size());
+        return l;
     }
 
     public JwtTokenProvider getJwtTokenProvider() {

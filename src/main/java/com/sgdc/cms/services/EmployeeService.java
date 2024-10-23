@@ -11,9 +11,11 @@ import com.sgdc.cms.dto.UpdateUserDto;
 import com.sgdc.cms.models.Department;
 import com.sgdc.cms.models.Employee;
 import com.sgdc.cms.models.Role;
+import com.sgdc.cms.models.Student;
 import com.sgdc.cms.repositories.DepartmentRepository;
 import com.sgdc.cms.repositories.EmployeeRepository;
 import com.sgdc.cms.repositories.RoleRepository;
+import com.sgdc.cms.repositories.StudentRepository;
 import com.sgdc.cms.security.jwt.JwtTokenProvider;
 
 import jakarta.annotation.PostConstruct;
@@ -21,6 +23,7 @@ import jakarta.annotation.PostConstruct;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -32,6 +35,7 @@ public class EmployeeService {
     private RoleRepository roleRepository;
     private DepartmentRepository departmentRepository;
     private JwtTokenProvider jwtTokenProvider;
+    private StudentRepository studentRepository;
 
     @Autowired
     public EmployeeService(EmployeeRepository empRepo, PasswordEncoder pwe, RoleRepository roleRepo,
@@ -41,6 +45,15 @@ public class EmployeeService {
         this.roleRepository = roleRepo;
         this.departmentRepository = dRepo;
     }
+
+    @Autowired
+	public void setStudentRepository(StudentRepository studentRepository) {
+		this.studentRepository = studentRepository;
+	}
+
+	public StudentRepository getStudentRepository() {
+		return studentRepository;
+	}
 
     public JwtTokenProvider getJwtTokenProvider() {
         return jwtTokenProvider;
@@ -126,44 +139,6 @@ public class EmployeeService {
         }
     }
 
-    private void createAdminIfNotExists(String username, String name, String email, String[] roleNames) {
-        if (employeeRepository.existsByUsername(username)) {
-            return; // Admin already exists
-        }
-
-        Employee employee = new Employee();
-        employee.setName(name);
-        employee.setEmail(email);
-        employee.setUsername(username);
-        employee.setPassword(passwordEncoder.encode("1234"));
-
-        Set<Role> roles = new HashSet<>();
-        for (String roleName : roleNames) {
-            Role role = roleRepository.findByRoleName(roleName);
-            if (role == null) {
-                role = new Role(roleName);
-                roleRepository.save(role);
-            }
-            roles.add(role);
-        }
-
-        for (Role r : roles) {
-            r.setRolename(r.getRolename());
-            employee.addRole(r);
-        }
-        logger.info("Creating admin user: {}", username);
-        Department dept = departmentRepository.findByDepartmentName("MANAGEMENT");
-        if (dept == null) {
-            dept = new Department();
-            dept.setDepartmentName("MANAGEMENT");
-            departmentRepository.save(dept);
-        }
-        employee.setDepartment(dept);
-
-        employeeRepository.save(employee);
-        logger.info("Admin user created: {}", username);
-    }
-
     public EmployeeDto convertToDto(Employee employee) {
         EmployeeDto employeeDto = new EmployeeDto();
         employeeDto.setName(employee.getName());
@@ -230,6 +205,55 @@ public class EmployeeService {
         }
 
         return true;
+    }
+
+    private void createAdminIfNotExists(String username, String name, String email, String[] roleNames) {
+        if (employeeRepository.existsByUsername(username)) {
+            return; // Admin already exists
+        }
+
+        Employee employee = new Employee();
+        employee.setName(name);
+        employee.setEmail(email);
+        employee.setUsername(username);
+        employee.setPassword(passwordEncoder.encode("1234"));
+
+        Set<Role> roles = new HashSet<>();
+        for (String roleName : roleNames) {
+            Role role = roleRepository.findByRoleName(roleName);
+            if (role == null) {
+                role = new Role(roleName);
+                roleRepository.save(role);
+            }
+            roles.add(role);
+        }
+
+        for (Role r : roles) {
+            r.setRolename(r.getRolename());
+            employee.addRole(r);
+        }
+        logger.info("Creating admin user: {}", username);
+        Department dept = departmentRepository.findByDepartmentName("MANAGEMENT");
+        if (dept == null) {
+            dept = new Department();
+            dept.setDepartmentName("MANAGEMENT");
+            departmentRepository.save(dept);
+        }
+        employee.setDepartment(dept);
+
+        employeeRepository.save(employee);
+        logger.info("Admin user created: {}", username);
+    }
+
+
+    public List<Student> retriveStudentsinDepartment(String token) {
+        String username = jwtTokenProvider.getUsernameFromToken(token);
+        Employee e = employeeRepository.findByUsername(username).orElseThrow(
+            () -> new RuntimeException("Retrieving Students by dept -> emp not found")
+        ); 
+        Department d = e.getDepartment();
+        List<Student> l = studentRepository.findAllByDepartment(d);
+        return l;
     }
 
 }

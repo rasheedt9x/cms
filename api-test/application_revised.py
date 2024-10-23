@@ -110,6 +110,31 @@ if response.status_code == 200:
             "religion": "Atheist",
             "studentAadhaar": "987654321098",
             "motherAadhaar": "987654321099"
+        },
+        {
+            "name": "Smityy",
+            "email": "mith@example.com",
+            "nationality": "British",
+            "gender": "Female",
+            "address": "456 Elm St, London",
+            "dateOfBirth": "02/02/2001",
+            "username": "aligeeeee",
+            "primaryPhone": "+1987654123",
+            "secondaryPhone": "+1987654322",
+            "guardianName": "Bob Smith",
+            "guardianPhone": "+1987654323",
+            "sscSchool": "London Academy",
+            "sscYearOfPassing": 2019,
+            "sscMarks": 92,
+            "intermediateCollege": "London College",
+            "intermediateYearOfPassing": 2021,
+            "intermediateMarks": 90,
+            "degreeCourse": "BCA",
+            "secondLanguage": "Hindi",
+            "caste": "General",
+            "religion": "Atheist",
+            "studentAadhaar": "987654321123",
+            "motherAadhaar": "987654321099"
         }
     ]
 
@@ -118,9 +143,10 @@ if response.status_code == 200:
         create_application(app)
 
     # Approve applications (assuming you know the application IDs)
-    application_ids = ["SGDCAP1001", "SGDCAP1002","SGDCAP1003"]  # Replace with actual IDs after creation
+    application_ids = ["SGDCAP1001", "SGDCAP1002","SGDCAP1003","SGDCAP1004"]  # Replace with actual IDs after creation
     for app_id in application_ids:
         approve_application(app_id)
+
 
 else:
     print("Login failed:", response.status_code, response.content)

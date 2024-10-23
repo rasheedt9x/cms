@@ -1,6 +1,7 @@
 package com.sgdc.cms.controllers;
 
 import java.security.Principal;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.sgdc.cms.dto.EmployeeDto;
 import com.sgdc.cms.dto.UpdateUserDto;
+import com.sgdc.cms.models.Student;
 import com.sgdc.cms.services.EmployeeService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,6 +42,14 @@ public class EmployeeController {
         String token = auth.substring(7);
         EmployeeDto dto = employeeService.retrieveEmployeeByToken(token);
         return ResponseEntity.ok().body(dto);
+    }
+
+    @GetMapping("/get/self/dept/students")
+    public ResponseEntity<?> getAllStudentsInDept(Principal principal,HttpServletRequest request) {
+        String auth = request.getHeader("Authorization");
+        String token = auth.substring(7);
+        List<Student> l = employeeService.retriveStudentsinDepartment(token);
+        return ResponseEntity.ok().body(l);
     }
 
 

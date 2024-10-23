@@ -96,7 +96,7 @@ public class ApplicationService {
 
         } catch (Exception e) {
             logger.error("Failed to parse date: " + dto.getDateOfBirth(), e);
-            throw new ApplicationSaveException("Failed to save application", e);
+            throw new ApplicationSaveException("Failed to save application -> Date Parsing", e);
         }
 
         try {
@@ -104,7 +104,7 @@ public class ApplicationService {
             return new String[] { application.getApplicationId(), application.getEmail() };
         } catch (Exception e) {
             logger.error("Error saving application: " + e.getMessage());
-            throw new ApplicationSaveException("Failed to save application", e);
+            throw new ApplicationSaveException("Failed to save application -> Repo", e);
         }
     }
 
@@ -242,6 +242,7 @@ public class ApplicationService {
         StudentGroup group = studentGroupRepository.findByGroupName(application.getDegreeCourse());
         if (group == null) {
             logger.warn("Student group not found for degree course: " + application.getDegreeCourse());
+            throw new RuntimeException("Student group not found");
         } else {
             dto.setGroup(group);
             logger.info("Group found: " + group.getGroupname());
