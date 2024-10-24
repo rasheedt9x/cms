@@ -48,6 +48,16 @@ public class Employee extends User{
 	@Column(name = "address")
     private String address;
 
+	@Column(name = "image")
+	private String image;
+
+	public String getImage() {
+		return image;
+	}
+
+	public void setImage(String image) {
+		this.image = image;
+	}
 
 	public LocalDate getDateOfApproval() {
 		return dateOfApproval;

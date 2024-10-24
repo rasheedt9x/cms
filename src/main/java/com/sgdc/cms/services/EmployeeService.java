@@ -7,6 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.sgdc.cms.dto.EmployeeDto;
+import com.sgdc.cms.dto.ImageUpdateDto;
 import com.sgdc.cms.dto.UpdateUserDto;
 import com.sgdc.cms.models.Department;
 import com.sgdc.cms.models.Employee;
@@ -17,11 +18,13 @@ import com.sgdc.cms.repositories.EmployeeRepository;
 import com.sgdc.cms.repositories.RoleRepository;
 import com.sgdc.cms.repositories.StudentRepository;
 import com.sgdc.cms.security.jwt.JwtTokenProvider;
+import com.sgdc.cms.utils.StorageUtils;
 
 import jakarta.annotation.PostConstruct;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Base64;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -47,13 +50,13 @@ public class EmployeeService {
     }
 
     @Autowired
-	public void setStudentRepository(StudentRepository studentRepository) {
-		this.studentRepository = studentRepository;
-	}
+    public void setStudentRepository(StudentRepository studentRepository) {
+        this.studentRepository = studentRepository;
+    }
 
-	public StudentRepository getStudentRepository() {
-		return studentRepository;
-	}
+    public StudentRepository getStudentRepository() {
+        return studentRepository;
+    }
 
     public JwtTokenProvider getJwtTokenProvider() {
         return jwtTokenProvider;
@@ -245,15 +248,69 @@ public class EmployeeService {
         logger.info("Admin user created: {}", username);
     }
 
-
     public List<Student> retriveStudentsinDepartment(String token) {
         String username = jwtTokenProvider.getUsernameFromToken(token);
         Employee e = employeeRepository.findByUsername(username).orElseThrow(
-            () -> new RuntimeException("Retrieving Students by dept -> emp not found")
-        ); 
+                () -> new RuntimeException("Retrieving Students by dept -> emp not found"));
         Department d = e.getDepartment();
         List<Student> l = studentRepository.findAllByDepartment(d);
         return l;
+    }
+
+    public ImageUpdateDto getImage(String token) {
+
+        logger.info("Received request to fetch image for token: " + token);
+        try {
+            String username = jwtTokenProvider.getUsernameFromToken(token);
+            logger.info("Username from token: " + username);
+
+            Employee employee = employeeRepository.findByUsername(username).orElseThrow(
+                    () -> new RuntimeException("Failed to fetch image -> employee not found"));
+
+            logger.info("Fetching image for " + employee.getName());
+
+            ImageUpdateDto dto = new ImageUpdateDto();
+
+            if (employee.getImage() != null) {
+                byte[] imageBytes = StorageUtils.getImageBytes(employee.getImage());
+                String b64 = Base64.getEncoder().encodeToString(imageBytes);
+                logger.info("Image fetched and encoded successfully");
+                dto.setImageBase64(b64);
+            } else {
+                logger.warn("Employee image is null");
+            }
+
+            return dto;
+
+        } catch (Exception e) {
+            logger.error("Error occurred in getImage: ", e);
+            throw new RuntimeException("Failed to fetch image", e);
+        }
+
+    }
+
+    public ImageUpdateDto updateEmployeeImage(ImageUpdateDto dto, String token) {
+        String username = jwtTokenProvider.getUsernameFromToken(token);
+        Employee e = employeeRepository.findByUsername(username).orElseThrow(
+                () -> new RuntimeException("Failed to update image -> emp not found"));
+
+        try {
+            if (dto.getImageBase64() != null) {
+                byte[] image = Base64.getDecoder().decode(dto.getImageBase64());
+                String imagePath = StorageUtils.saveImageToStorage(image, "employees", e.getEmployeeId() + ".jpg");
+                e.setImage(imagePath);
+                logger.info("Saving image as " + e.getImage());
+                e = employeeRepository.save(e);
+            } else {
+                e.setImage(null);
+            }
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new RuntimeException("Failure updation of image");
+        }
+
+        return dto;
     }
 
 }

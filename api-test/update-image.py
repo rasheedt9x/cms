@@ -22,8 +22,9 @@ def image():
         "Content-Type": "application/json"
     }
 
+    IMAGE_NAME = "book.jpg"
     
-    with open("book.jpg", "rb") as image_file:
+    with open(IMAGE_NAME, "rb") as image_file:
         encoded_image = base64.b64encode(image_file.read()).decode('utf-8')
         imageBase64 = encoded_image  # Add the encoded image to book_data
 
@@ -31,13 +32,29 @@ def image():
         "imageBase64": imageBase64
     }
 
-    # r1 = requests.post(main_url + "students/get/updateImage",headers=headers, json=dto)
+    ## Updating employee Image
+    # r1 = requests.post(main_url + "employees/get/updateImage",headers=headers, json=dto)
     # print(r1.content)
 
 
+    ## Fetching employee image
+    # r1 = requests.get(main_url + "employees/get/self/image",headers=headers)
+    # image = base64.b64decode(r1.json()["imageBase64"])
+    # with open("emp.jpg", "wb") as f:
+    #     f.write(image)
+
+
+
+
+    # Updating students Image
+    r1 = requests.post(main_url + "students/get/updateImage",headers=headers, json=dto)
+    print(r1.content)
+
+
+    # Fetching students image
     r1 = requests.get(main_url + "students/get/self/image",headers=headers)
     image = base64.b64decode(r1.json()["imageBase64"])
-    with open("image.jpg", "wb") as f:
+    with open("stud.jpg", "wb") as f:
         f.write(image)
 
     

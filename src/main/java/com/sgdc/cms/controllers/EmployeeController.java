@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sgdc.cms.dto.EmployeeDto;
+import com.sgdc.cms.dto.ImageUpdateDto;
 import com.sgdc.cms.dto.UpdateUserDto;
 import com.sgdc.cms.models.Student;
 import com.sgdc.cms.services.EmployeeService;
@@ -65,4 +66,19 @@ public class EmployeeController {
         boolean updated = employeeService.changePasswordOrEmail(dto, token.substring(7));
 	    return ResponseEntity.status(HttpStatus.OK).body("Password or Email Changed Successfully");
 	}
+
+
+	
+    @PostMapping("/get/updateImage")
+    public ResponseEntity<?> updateEmployeeImage(@RequestBody ImageUpdateDto dto,
+            @RequestHeader("Authorization") String token) {
+        ImageUpdateDto dto1 = employeeService.updateEmployeeImage(dto, token.substring(7));
+        return ResponseEntity.ok().body("Image updated successfully");
+    }
+
+    @GetMapping("/get/self/image")
+    public ResponseEntity<?> getEmployeeImage(@RequestHeader("Authorization") String token) {
+        ImageUpdateDto dto1 = employeeService.getImage(token.substring(7));
+        return ResponseEntity.ok().body(dto1);
+    }
 }
