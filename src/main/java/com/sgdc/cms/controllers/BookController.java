@@ -24,6 +24,13 @@ public class BookController {
         return ResponseEntity.status(HttpStatus.CREATED).body(savedBookDto);
     }
 
+
+    @PostMapping(value = "/delete/{id}")
+    public ResponseEntity<?> deleteBookById(@PathVariable("id") Long id) {
+        bookService.deleteBook(id);
+        return ResponseEntity.ok("Book deleted successfully");
+    }
+
     @GetMapping("/all")
     public ResponseEntity<?> getAllBooks() {
         return ResponseEntity.status(HttpStatus.OK).body(bookService.retrieveAllBooks());

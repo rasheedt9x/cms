@@ -34,9 +34,9 @@ def library():
     }
 
     
-    ## REQUEST A BOOK BY ITS ID
-    # r1 = requests.post(main_url + "bookloan/request",headers=stud_headers,json=dto)
-    # print(r1.content)
+    # REQUEST A BOOK BY ITS ID
+    r1 = requests.post(main_url + "bookloan/request",headers=stud_headers,json=dto)
+    print(r1.content)
 
     ### GET ALL BOOKLOANS (LIBRARIAN ONLY)
     r1 = requests.get(main_url + "bookloan/all",headers=headers)
@@ -56,12 +56,12 @@ def library():
 
 
     ### GET ALL BOOK LOANS OF THE CURRENT USER
-    r1 = requests.get(main_url + "bookloan/self",headers=stud_headers)
-    print(r1.content)
+    # r1 = requests.get(main_url + "bookloan/self",headers=stud_headers)
+    # print(r1.content)
 
     
-    r1 = requests.post(main_url + "bookloan/renew/1",headers=stud_headers)
-    print(r1.content)
+    # r1 = requests.post(main_url + "bookloan/renew/1",headers=stud_headers)
+    # print(r1.content)
     
     
 library()

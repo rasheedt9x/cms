@@ -46,12 +46,12 @@ headers = {
 response = requests.get(url + "/all",headers=headers)
 # Check the responsbbbe
 if response.status_code == 200:
-    print("Book registered successfully!")
+#    print("Book registered successfully!")
     print(len(response.json()))
-    print("Response:", response.json()[2]["imageBase64"])
+    print("Response:", response.json())
 
-    with open("img.jpg","wb") as f:
-        f.write(base64.b64decode(response.json()[2]["imageBase64"]))
+    # with open("img.jpg","wb") as f:
+    #     f.write(base64.b64decode(response.json()[2]["imageBase64"]))
     
 else:
     print("Failed to register book.")
@@ -59,3 +59,6 @@ else:
     print("Response:", response.text)
 
 #print(response.content)
+
+r1 = requests.post(url + "/delete/1", headers=headers)
+print(r1.content)
