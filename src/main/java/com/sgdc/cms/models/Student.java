@@ -1,8 +1,8 @@
 package com.sgdc.cms.models;
 
-import java.time.LocalDate;
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sgdc.cms.annotations.CustomStudentID;
 
 import jakarta.persistence.Column;
@@ -98,13 +98,23 @@ public class Student extends User {
     @Column(name = "mother_aadhaar")
     private String motherAadhaar;
 
-
 	@ManyToOne
     @JoinColumn(name = "dept_id")    
     private Department department;
 
+	@Column(name = "image")
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private String image;
 
-    public Department getDepartment() {
+    public String getImage() {
+		return image;
+	}
+
+	public void setImage(String image) {
+		this.image = image;
+	}
+
+	public Department getDepartment() {
 		return department;
 	}
 

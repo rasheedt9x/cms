@@ -6,6 +6,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
@@ -13,7 +15,7 @@ import org.springframework.stereotype.Component;
  */
 public class StorageUtils {
     public static final String UPLOAD_DIR = "images/";
-
+    public static final Logger logger = LoggerFactory.getLogger(StorageUtils.class);
 
     public static String saveImageToStorage(byte[] imageBytes, String folder, String fileName) {
          Path dirPath = Paths.get(UPLOAD_DIR + folder);
@@ -38,6 +40,7 @@ public class StorageUtils {
     }
 
     public static byte[] getImageBytes(String filePath) {
+        logger.info("Fetching file of " + filePath);
         File imagePath = Paths.get(filePath).toFile();
         if (!imagePath.exists()) {
         	throw new RuntimeException("File not found" + imagePath);

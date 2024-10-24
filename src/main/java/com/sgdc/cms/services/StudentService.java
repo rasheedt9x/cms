@@ -1,6 +1,7 @@
 package com.sgdc.cms.services;
 
 import java.text.SimpleDateFormat;
+import java.util.Base64;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.sgdc.cms.dto.ImageUpdateDto;
 import com.sgdc.cms.dto.StudentDto;
 import com.sgdc.cms.dto.UpdateUserDto;
 import com.sgdc.cms.models.Department;
@@ -22,6 +24,7 @@ import com.sgdc.cms.repositories.RoleRepository;
 import com.sgdc.cms.repositories.StudentGroupRepository;
 import com.sgdc.cms.repositories.StudentRepository;
 import com.sgdc.cms.security.jwt.JwtTokenProvider;
+import com.sgdc.cms.utils.StorageUtils;
 
 @Service
 public class StudentService {
@@ -36,7 +39,7 @@ public class StudentService {
     private EmployeeRepository employeeRepository;
     private JwtTokenProvider jwtTokenProvider;
 
-	@Autowired
+    @Autowired
     public StudentService(StudentRepository repo, PasswordEncoder pwe, RoleRepository roleRepo,
             StudentGroupRepository sgr, DepartmentRepository deptRepo) {
         this.studentRepository = repo;
@@ -46,14 +49,14 @@ public class StudentService {
         this.departmentRepository = deptRepo;
     }
 
-	public EmployeeRepository getEmployeeRepository() {
-		return employeeRepository;
-	}
+    public EmployeeRepository getEmployeeRepository() {
+        return employeeRepository;
+    }
 
     @Autowired
     public void setEmployeeRepository(EmployeeRepository employeeRepository) {
-		this.employeeRepository = employeeRepository;
-	}
+        this.employeeRepository = employeeRepository;
+    }
 
     public Student findStudentByToken(String token) {
         String username = this.jwtTokenProvider.getUsernameFromToken(token);
@@ -133,7 +136,8 @@ public class StudentService {
 
             Department dept = departmentRepository.findByDepartmentName(depName);
             if (dept == null) {
-                throw new RuntimeException("Error saving student -> department search -> not found with name " + depName);
+                throw new RuntimeException(
+                        "Error saving student -> department search -> not found with name " + depName);
             } else {
                 s.setDepartment(dept);
             }
@@ -195,19 +199,93 @@ public class StudentService {
 
     }
 
-
     public List<Employee> retrieveTeachersByDepartment(String token) {
         String username = jwtTokenProvider.getUsernameFromToken(token);
         Student s = studentRepository.findByUsername(username).orElseThrow(
-            () -> new RuntimeException("Retrieving teachers in student dept -> couldnt find student")
-        );
+                () -> new RuntimeException("Retrieving teachers in student dept -> couldnt find student"));
         logger.info(s.getName() + " " + "fetching teachers");
         Department d = s.getDepartment();
         logger.info(s.getDepartment().getDepartmentName() + " " + "teachers");
         List<Employee> l = employeeRepository.findAllByDepartment(d);
-        logger.info("Length of l: {}",l.size());
+        logger.info("Length of l: {}", l.size());
         return l;
     }
+
+    public ImageUpdateDto updateStudentImage(ImageUpdateDto dto, String token) {
+        String username = jwtTokenProvider.getUsernameFromToken(token);
+        Student student = studentRepository.findByUsername(username).orElseThrow(
+                () -> new RuntimeException("Failed to update image -> stud not found"));
+
+        try {
+            if (dto.getImageBase64() != null) {
+                byte[] image = Base64.getDecoder().decode(dto.getImageBase64());
+                String imagePath = StorageUtils.saveImageToStorage(image, "students", student.getStudentId() + ".jpg");
+                student.setImage(imagePath);
+                logger.info("Saving image as " + student.getImage());
+                student = studentRepository.save(student);
+            } else {
+                student.setImage(null);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failure updation of image");
+        }
+
+        return dto;
+    }
+
+    // public ImageUpdateDto getImage(String token) {
+    //     String username = jwtTokenProvider.getUsernameFromToken(token);
+    //     Student student = studentRepository.findByUsername(username).orElseThrow(
+    //             () -> new RuntimeException("Failed to fetch image -> stud not found"));
+    //     logger.info("Fetching image for " + student.getName());
+    //     ImageUpdateDto dto = new ImageUpdateDto();
+
+    //     logger.info("Student Image is " + student.getImage());
+    //     if (student.getImage() != null) {
+    //         byte[] imageBytes = StorageUtils.getImageBytes(student.getImage());
+    //         String b64 = Base64.getEncoder().encodeToString(imageBytes);
+    //         logger.info(b64);
+    //         dto.setImageBase64(b64);
+    //     } else {
+    //         logger.info("Student image is null");
+    //     }
+    //     return dto;
+    // }
+
+public ImageUpdateDto getImage(String token) {
+    logger.info("Received request to fetch image for token: " + token);
+    try {
+        String username = jwtTokenProvider.getUsernameFromToken(token);
+        logger.info("Username from token: " + username);
+
+        Student student = studentRepository.findByUsername(username).orElseThrow(
+            () -> new RuntimeException("Failed to fetch image -> student not found")
+        );
+
+        logger.info("Fetching image for " + student.getName());
+
+        ImageUpdateDto dto = new ImageUpdateDto();
+
+        if (student.getImage() != null) {
+            byte[] imageBytes = StorageUtils.getImageBytes(student.getImage());
+            String b64 = Base64.getEncoder().encodeToString(imageBytes);
+            logger.info("Image fetched and encoded successfully");
+            dto.setImageBase64(b64);
+        } else {
+            logger.warn("Student image is null");
+        }
+
+        return dto;
+
+    } catch (Exception e) {
+        logger.error("Error occurred in getImage: ", e);
+        throw new RuntimeException("Failed to fetch image", e);
+    }
+}
+
+
 
     public JwtTokenProvider getJwtTokenProvider() {
         return jwtTokenProvider;
@@ -217,5 +295,4 @@ public class StudentService {
     public void setJwtTokenProvider(JwtTokenProvider jwtTokenProvider) {
         this.jwtTokenProvider = jwtTokenProvider;
     }
-
 }
