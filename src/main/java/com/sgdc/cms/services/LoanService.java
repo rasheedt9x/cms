@@ -189,7 +189,7 @@ public class LoanService {
         book.setAvailableCopies(book.getAvailableCopies() + 1);
         bookRepository.save(book);
 
-        loanRepository.save(loan);
+        loanRepository.delete(loan);
     }
 
     public List<LoanDto> retriveAllLoansByUser(String token) {
